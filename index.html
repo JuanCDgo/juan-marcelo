@@ -62,18 +62,127 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Tarjetas con Inset Declarado Explícito en CSS (Evita cramped-padding) */
+    /* Tarjetas Interactivas con Spotlight Linear y Padding Explícito */
     .linear-card {
+      position: relative;
       background-color: #131620;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px;
       padding: 28px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      transition: border-color 0.2s ease, transform 0.2s ease;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      overflow: hidden;
     }
     .linear-card:hover {
-      border-color: rgba(255, 255, 255, 0.18);
-      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.22);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65);
+    }
+    .linear-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: radial-gradient(400px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(16, 185, 129, 0.15), transparent 45%);
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .linear-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Animaciones de Micro-interacción en Hover */
+    @keyframes laserSweep {
+      0% { top: 0%; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .laser-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #10B981, transparent);
+      
+      opacity: 0;
+      pointer-events: none;
+    }
+    .linear-card:hover .laser-line,
+    .auto-laser .laser-line {
+      animation: laserSweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    /* Pulso de Paquetes en Sincronización Local-First */
+    @keyframes packetFlow {
+      0% { left: 0%; opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+    .packet-dot {
+      position: absolute;
+      top: -3px;
+      width: 7px;
+      height: 7px;
+      border-radius: 9999px;
+      background-color: #10B981;
+      
+      opacity: 0;
+    }
+    .linear-card:hover .packet-dot {
+      animation: packetFlow 1.8s ease-in-out infinite;
+    }
+
+    /* Sellos elásticos */
+    @keyframes stampPop {
+      0% { transform: scale(0.6) rotate(-15deg); opacity: 0; }
+      70% { transform: scale(1.25) rotate(6deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .stamp-animated-active {
+      animation: stampPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Barra de stock dinámico */
+    .stock-bar-indicator {
+      width: 80%;
+      transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.7s ease;
+    }
+    .linear-card:hover .stock-bar-indicator {
+      width: 15%;
+      background-color: #EF4444;
+    }
+    .stock-alert-chip {
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
+    }
+    .linear-card:hover .stock-alert-chip {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Odometer & Highlight en Hover */
+    .hover-highlight-green {
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .linear-card:hover .hover-highlight-green {
+      color: #34D399;
+      transform: scale(1.02);
+    }
+    .hover-reveal-box {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.4s ease, max-height 0.4s ease, margin 0.4s ease;
+    }
+    .linear-card:hover .hover-reveal-box {
+      opacity: 1;
+      max-height: 80px;
+      margin-top: 8px;
     }
 
     .sub-card-box {
@@ -287,10 +396,16 @@
             </button>
           </div>
 
-          <!-- Atajos de Teclado -->
-          <div class="hidden sm:flex items-center gap-2">
-            <span class="kbd-chip">F10 Cobrar</span>
-            <span class="kbd-chip">ESC Cancelar</span>
+          <!-- Simulador en Vivo / Atajos -->
+          <div class="flex items-center gap-2.5">
+            <button onclick="toggleAutopilot()" id="autopilotBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-mono text-emerald-400 hover:bg-emerald-900/50 transition-colors shadow-sm" title="Pausar o reanudar simulación automática">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" id="autopilotDot"></span>
+              <span id="autopilotLabel">En Vivo · Simulación</span>
+            </button>
+            <div class="hidden sm:flex items-center gap-1.5">
+              <span class="kbd-chip">F10 Cobrar</span>
+              <span class="kbd-chip">ESC Cancelar</span>
+            </div>
           </div>
 
         </div>
@@ -468,59 +583,142 @@
         </p>
       </div>
 
-      <!-- Cuadrícula de 4 Pilares -->
+      <!-- Cuadrícula de 4 Pilares con Micro-Interacciones en Hover -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
         
-        <!-- Pilar 1 -->
-        <div class="linear-card space-y-3">
-          <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-            </svg>
+        <!-- Pilar 1: Punto de Venta con Escaneo Láser -->
+        <div class="linear-card flex flex-col justify-between space-y-4 group">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-dark-text">Punto de Venta Ágil</h3>
+            <p class="text-sm text-dark-muted leading-relaxed">
+              Cobro rápido por código de barras o teclado numérico. Soporte para efectivo, transferencias, QR y comprobantes instantáneos.
+            </p>
           </div>
-          <h3 class="text-lg font-bold text-dark-text">Punto de Venta Ágil</h3>
-          <p class="text-sm text-dark-muted leading-relaxed">
-            Cobro rápido por código de barras o teclado numérico. Soporte para efectivo, transferencias, QR y comprobantes instantáneos.
-          </p>
+
+          <!-- Micro-módulo interactivo: Lector de Barras (Plano con Divisores) -->
+          <div class="relative overflow-hidden pt-3 border-t border-dark-border space-y-2">
+            <div class="laser-line"></div>
+            <div class="flex items-center justify-between text-[11px] font-mono text-dark-muted">
+              <span>SCANNER LÁSER</span>
+              <span class="text-emerald-400 font-bold">● EN LÍNEA</span>
+            </div>
+            <div class="h-5 flex items-center justify-center gap-[3px] py-0.5">
+              <span class="w-[2px] h-full bg-dark-muted/40"></span>
+              <span class="w-[4px] h-full bg-dark-text/80"></span>
+              <span class="w-[1px] h-full bg-dark-muted/40"></span>
+              <span class="w-[3px] h-full bg-dark-text/80"></span>
+              <span class="w-[2px] h-full bg-emerald-400"></span>
+              <span class="w-[1px] h-full bg-dark-muted/40"></span>
+              <span class="w-[3px] h-full bg-dark-text/80"></span>
+              <span class="w-[4px] h-full bg-dark-text/80"></span>
+              <span class="w-[1px] h-full bg-dark-muted/40"></span>
+              <span class="w-[2px] h-full bg-dark-text/80"></span>
+            </div>
+            <div class="flex items-center justify-between text-xs pt-0.5">
+              <span class="text-dark-text font-medium truncate">Gaseosa Cola 1.5L</span>
+              <span class="font-mono text-emerald-400 font-bold tabular-nums">ARS $ 1.800,00</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Pilar 2 -->
-        <div class="linear-card space-y-3">
-          <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
+        <!-- Pilar 2: Inventario con Alerta de Agotamiento -->
+        <div class="linear-card flex flex-col justify-between space-y-4 group">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-dark-text">Inventario y Faltantes</h3>
+            <p class="text-sm text-dark-muted leading-relaxed">
+              Actualización inmediata en cada venta. Alertas antes de que un producto se agote y cálculo de margen de ganancia real por artículo.
+            </p>
           </div>
-          <h3 class="text-lg font-bold text-dark-text">Inventario y Faltantes</h3>
-          <p class="text-sm text-dark-muted leading-relaxed">
-            Actualización inmediata en cada venta. Alertas antes de que un producto se agote y cálculo de margen de ganancia real por artículo.
-          </p>
+
+          <!-- Micro-módulo interactivo: Monitor de Stock (Plano con Divisores) -->
+          <div class="pt-3 border-t border-dark-border space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-dark-text font-medium truncate">Fernet Branca 750ml</span>
+              <span class="font-mono text-xs text-amber-400 font-bold">12 u. en stock</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
+              <div class="h-full rounded-full bg-emerald-500 stock-bar-indicator"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-dark-muted pt-0.5">
+              <span>Mínimo: 4 u.</span>
+              <span class="text-rose-400 font-medium stock-alert-chip">⚠️ Reposición sugerida</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Pilar 3 -->
-        <div class="linear-card space-y-3">
-          <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
+        <!-- Pilar 3: Caja y Arqueo Diario con Odómetro -->
+        <div class="linear-card flex flex-col justify-between space-y-4 group">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-dark-text">Caja y Arqueo Diario</h3>
+            <p class="text-sm text-dark-muted leading-relaxed">
+              Apertura y cierre de turnos sin complicaciones. Registro de gastos menores, retiros y balance final sin planillas manuales.
+            </p>
           </div>
-          <h3 class="text-lg font-bold text-dark-text">Caja y Arqueo Diario</h3>
-          <p class="text-sm text-dark-muted leading-relaxed">
-            Apertura y cierre de turnos sin complicaciones. Registro de gastos menores, retiros y balance final sin planillas manuales.
-          </p>
+
+          <!-- Micro-módulo interactivo: Desglose de Caja (Plano con Divisores) -->
+          <div class="pt-3 border-t border-dark-border space-y-1.5">
+            <div class="flex items-center justify-between text-[11px] font-mono text-dark-muted">
+              <span>ARQUEO EN VIVO</span>
+              <span class="text-emerald-400 font-bold">✓ CUADRADO</span>
+            </div>
+            <div class="flex justify-between text-dark-muted text-[11px]">
+              <span>Efectivo + QR</span>
+              <span class="font-mono tabular-nums text-dark-text">ARS $ 45.800,00</span>
+            </div>
+            <div class="pt-1 border-t border-dark-border/60 flex justify-between items-center text-xs">
+              <span class="text-dark-muted font-bold">BALANCE TOTAL</span>
+              <span class="font-mono text-emerald-400 font-extrabold tabular-nums hover-highlight-green">ARS $ 45.800,00</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Pilar 4 -->
-        <div class="linear-card space-y-3">
-          <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
+        <!-- Pilar 4: Local-First con Paquetes de Sincronización -->
+        <div class="linear-card flex flex-col justify-between space-y-4 group">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-dark-text">Local-First y Nube</h3>
+            <p class="text-sm text-dark-muted leading-relaxed">
+              Opera de forma local y autónoma aunque se corte la red. Respaldo periódico y copias de seguridad en Google Drive.
+            </p>
           </div>
-          <h3 class="text-lg font-bold text-dark-text">Local-First y Nube</h3>
-          <p class="text-sm text-dark-muted leading-relaxed">
-            Opera de forma local y autónoma aunque se corte la red. Respaldo periódico y copias de seguridad en Google Drive.
-          </p>
+
+          <!-- Micro-módulo interactivo: Nodos de Red y Paquetes (Plano con Divisores) -->
+          <div class="pt-3 border-t border-dark-border space-y-2">
+            <div class="flex items-center justify-between text-[11px] font-mono text-dark-muted">
+              <span>ESTADO RED</span>
+              <span class="text-emerald-400 font-bold">100% AUTÓNOMO</span>
+            </div>
+            <div class="relative flex items-center justify-between py-1">
+              <span class="text-xs font-mono text-dark-text">PC / Local</span>
+              <div class="flex-1 mx-3 relative flex items-center justify-center">
+                <div class="w-full h-[1px] bg-zinc-700"></div>
+                <div class="packet-dot"></div>
+              </div>
+              <span class="text-xs font-mono text-emerald-400">Drive Backup</span>
+            </div>
+            <div class="text-[11px] text-emerald-400/90 text-center font-medium">
+              Opera continuo sin depender de Internet
+            </div>
+          </div>
         </div>
 
       </div>
@@ -577,11 +775,11 @@
         </p>
       </div>
 
-      <!-- Cuadrícula 2x2 -->
+      <!-- Cuadrícula 2x2 con Módulos Visuales Interactivos en Hover -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         
         <!-- App 1: Mini CRM Móvil & Preventa -->
-        <div class="linear-card flex flex-col justify-between space-y-6">
+        <div class="linear-card flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Calle & Preventistas</span>
@@ -591,6 +789,31 @@
             <p class="text-sm text-dark-muted leading-relaxed">
               Diseñado para preventistas y distribuidores que recorren comercios. Registrá visitas, tomá pedidos en depósitos sin señal y exportá directo a Excel o Google Drive.
             </p>
+
+            <!-- Módulo Visual Interactivo: Hoja de Ruta GPS (Plano con Divisores) -->
+            <div class="pt-3 border-t border-dark-border space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-dark-text">Hoja de Ruta #04 · San Martín</span>
+                <span class="font-mono text-[11px] text-emerald-400 font-bold">● 12 COMERCIOS</span>
+              </div>
+              <div class="divide-y divide-dark-border text-xs">
+                <div class="flex items-center justify-between py-1.5">
+                  <span class="text-dark-text font-medium flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Almacén San Cayetano</span>
+                  </span>
+                  <span class="text-emerald-400 font-mono font-bold">ARS $ 18.500,00</span>
+                </div>
+                <div class="flex items-center justify-between py-1.5 text-dark-muted">
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    <span>Kiosco El Trébol</span>
+                  </span>
+                  <span class="font-mono text-amber-400">En recorrido</span>
+                </div>
+              </div>
+            </div>
+
             <div class="flex flex-wrap gap-2 text-xs font-medium text-dark-muted pt-1">
               <span>• Toma ágil de pedidos</span>
               <span>• Hojas de ruta</span>
@@ -609,7 +832,7 @@
         </div>
 
         <!-- App 2: Club de Fidelidad & Sellos -->
-        <div class="linear-card flex flex-col justify-between space-y-6">
+        <div class="linear-card flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-amber-400">Retención de Clientes</span>
@@ -619,6 +842,28 @@
             <p class="text-sm text-dark-muted leading-relaxed">
               Reemplazá las tarjetas de cartón que se pierden por un sistema digital de sellos y progreso concedido. Tus clientes canjean premios transparentes por WhatsApp y vos personalizás metas, premios y tu logo en un clic.
             </p>
+
+            <!-- Módulo Visual Interactivo: Matriz de Sellos (Plano con Divisores) -->
+            <div class="pt-3 border-t border-dark-border space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-dark-text">Tarjeta Digital Socio VIP</span>
+                <span class="font-mono text-[11px] text-amber-400 font-bold">7 de 8 Sellos</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2 py-1 text-center">
+                <span class="text-base py-1">⭐</span>
+                <span class="text-base py-1">⭐</span>
+                <span class="text-base py-1">⭐</span>
+                <span class="text-base py-1">⭐</span>
+                <span class="text-base py-1">⭐</span>
+                <span class="text-base py-1">⭐</span>
+                <span class="text-base py-1">⭐</span>
+                <span class="text-base py-1 group-hover:stamp-animated-active">⭐</span>
+              </div>
+              <div class="text-[11px] text-amber-400 font-medium text-center">
+                🎁 Próximo sello desbloquea premio gratis
+              </div>
+            </div>
+
             <div class="flex flex-wrap gap-2 text-xs font-medium text-dark-muted pt-1">
               <span>• Sellos digitales</span>
               <span>• Historial de canjes</span>
@@ -636,8 +881,8 @@
           </div>
         </div>
 
-        <!-- App 3: Peluquería & Color -->
-        <div class="linear-card flex flex-col justify-between space-y-6">
+        <!-- App 3: Peluquería & Color (3 en 1) -->
+        <div class="linear-card flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Estética & Salones</span>
@@ -647,6 +892,25 @@
             <p class="text-sm text-dark-muted leading-relaxed">
               3 en 1 para tu salón: agenda visual de turnos sin huecos, ficha técnica capilar con fórmulas de tintura por clienta y club de fidelidad con sellos automáticos por visita. Totalmente editable con tu logo y tarifas.
             </p>
+
+            <!-- Módulo Visual Interactivo: Agenda & Ficha Técnica (Plano con Divisores) -->
+            <div class="pt-3 border-t border-dark-border space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-dark-text">Turno de Hoy · 16:30 hs</span>
+                <span class="font-mono text-[11px] text-emerald-400 font-bold">✓ CONFIRMADO</span>
+              </div>
+              <div class="divide-y divide-dark-border text-xs">
+                <div class="flex items-center justify-between py-1.5">
+                  <span class="font-bold text-dark-text">Martina · Cobrizo</span>
+                  <span class="text-[11px] text-emerald-400 font-mono">Fórmula 7.4 + 8.34</span>
+                </div>
+                <div class="flex items-center justify-between py-1 text-dark-muted text-[11px]">
+                  <span>Avisado por WhatsApp</span>
+                  <span class="text-amber-400 font-mono font-bold">4 sellos acumulados</span>
+                </div>
+              </div>
+            </div>
+
             <div class="flex flex-wrap gap-2 text-xs font-medium text-dark-muted pt-1">
               <span>• Turnero + Ficha + Fidelización</span>
               <span>• Agenda por profesional</span>
@@ -665,7 +929,7 @@
         </div>
 
         <!-- App 4: Distribuidora & Bebidas -->
-        <div class="linear-card flex flex-col justify-between space-y-6">
+        <div class="linear-card flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Comercio & Packs</span>
@@ -675,6 +939,25 @@
             <p class="text-sm text-dark-muted leading-relaxed">
               Manejo especializado de unidades sueltas, cajones y packs cerrados. Listas de precios diferenciadas por cliente mayorista o minorista y carga ágil para reparto.
             </p>
+
+            <!-- Módulo Visual Interactivo: Precios Mayoristas Dinámicos (Plano con Divisores) -->
+            <div class="pt-3 border-t border-dark-border space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-dark-text">Promo Fernet 1L + 2 Cola</span>
+                <span class="font-mono text-[11px] text-emerald-400 font-bold">LISTA MAYORISTA</span>
+              </div>
+              <div class="grid grid-cols-2 gap-4 py-1 text-xs">
+                <div>
+                  <span class="text-[11px] text-dark-muted block">Por Unidad</span>
+                  <span class="font-mono font-bold text-dark-text tabular-nums">ARS $ 9.500,00</span>
+                </div>
+                <div>
+                  <span class="text-[11px] text-emerald-400 block font-bold">Cajón x6 (Pack)</span>
+                  <span class="font-mono font-bold text-white tabular-nums">ARS $ 8.100,00 c/u</span>
+                </div>
+              </div>
+            </div>
+
             <div class="flex flex-wrap gap-2 text-xs font-medium text-dark-muted pt-1">
               <span>• Venta pack vs unidad</span>
               <span>• Precios mayoristas</span>
@@ -1042,6 +1325,74 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         cerrarDemoModal();
+      }
+    });
+
+    // ==========================================
+    // 6. Efecto Spotlight Linear en Cursor
+    // ==========================================
+    function initLinearSpotlights() {
+      document.querySelectorAll('.linear-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+    }
+
+    // ==========================================
+    // 7. Simulador Auto-Pilot en el Hero (Estilo Linear)
+    // ==========================================
+    let autopilotEnabled = true;
+    let autopilotStep = 0;
+    let autopilotInterval = null;
+
+    function toggleAutopilot() {
+      autopilotEnabled = !autopilotEnabled;
+      const dot = document.getElementById('autopilotDot');
+      const label = document.getElementById('autopilotLabel');
+      if (autopilotEnabled) {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+        label.innerText = 'En Vivo · Simulación';
+      } else {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400';
+        label.innerText = 'Pausa Manual';
+      }
+    }
+
+    function stepAutopilot() {
+      if (!autopilotEnabled) return;
+      autopilotStep = (autopilotStep + 1) % 4;
+
+      if (autopilotStep === 0) {
+        switchTab('pos');
+        if (cobradoLinear) simularCobroLinear(); // Resetear estado de cobro
+      } else if (autopilotStep === 1) {
+        // Simular cobro y emisión
+        simularCobroLinear();
+      } else if (autopilotStep === 2) {
+        // Ver stock en vivo
+        switchTab('stock');
+      } else if (autopilotStep === 3) {
+        // Ver arqueo de caja
+        switchTab('caja');
+      }
+    }
+
+    // Inicialización al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      initLinearSpotlights();
+      autopilotInterval = setInterval(stepAutopilot, 4500);
+
+      // Si el usuario interactúa con el mockup, pausar el auto-pilot suavemente
+      const heroMockup = document.querySelector('.tab-view')?.parentElement;
+      if (heroMockup) {
+        heroMockup.addEventListener('mouseenter', () => {
+          if (autopilotEnabled) toggleAutopilot();
+        });
       }
     });
   </script>
