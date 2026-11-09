@@ -1,0 +1,6 @@
+# Binarios del motor Impeccable (se descargan automáticos al ejecutar)
+**/scripts/bin/
+**/scripts/live-browser.js
+.impeccable/questions/
+.impeccable/mocks/
+.impeccable/review/

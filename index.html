@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Juan Marcelo · Software de Gestión y Mini Apps para Comercios</title>
+  <meta name="description" content="Software de gestión ágil, punto de venta y herramientas especializadas creadas a la medida de tu trabajo diario. Desarrollado por Juan Marcelo.">
+  <meta name="theme-color" content="#0B0D13">
+
+  <!-- Tipografía Figtree y JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Reset y base tipográfica estricta */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      background-color: #0B0D13;
+      color: #F1F4F9;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    html:not(.dark) body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+    }
+
+    /* Jerarquía Tipográfica Explícita y Escalada */
+    h1 {
+      font-size: 2.75rem;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #F1F4F9;
+    }
+    html:not(.dark) h1 {
+      color: #0F172A;
+    }
+
+    h2 {
+      font-size: 2rem;
+      line-height: 1.25;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #F1F4F9;
+    }
+    html:not(.dark) h2 {
+      color: #0F172A;
+    }
+
+    h3 {
+      font-size: 1.35rem;
+      line-height: 1.35;
+      font-weight: 700;
+      color: #F1F4F9;
+    }
+    html:not(.dark) h3 {
+      color: #0F172A;
+    }
+
+    h4 {
+      font-size: 1.1rem;
+      line-height: 1.4;
+      font-weight: 600;
+      color: #F1F4F9;
+    }
+    html:not(.dark) h4 {
+      color: #0F172A;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Scrollbar personalizada sobria */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .dark ::-webkit-scrollbar-track {
+      background: #0B0D13;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #222738;
+      border-radius: 4px;
+    }
+    .dark ::-webkit-scrollbar-thumb:hover {
+      background: #323A52;
+    }
+    html:not(.dark) ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    html:not(.dark) ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Selección de texto */
+    .dark ::selection {
+      background: #10B981;
+      color: #0B0D13;
+    }
+    html:not(.dark) ::selection {
+      background: #10B981;
+      color: #FFFFFF;
+    }
+
+    /* Enfoque accesible */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #10B981;
+      outline-offset: 2px;
+    }
+
+    /* Modal Backdrop con padding seguro */
+    .modal-backdrop-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background-color: rgba(11, 13, 19, 0.90);
+      backdrop-filter: blur(12px);
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Figtree"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              emerald: '#10B981',
+              emeraldHover: '#059669',
+              emeraldBg: 'rgba(16, 185, 129, 0.12)',
+              amber: '#F59E0B',
+            },
+            dark: {
+              bg: '#0B0D13',
+              card: '#131620',
+              cardHover: '#181C28',
+              border: '#222738',
+              borderLight: '#2D3449',
+              text: '#F1F4F9',
+              muted: '#94A1B8',
+            },
+            light: {
+              bg: '#F8FAFC',
+              card: '#FFFFFF',
+              cardHover: '#F1F5F9',
+              border: '#E2E8F0',
+              borderDark: '#CBD5E1',
+              text: '#0F172A',
+              muted: '#475569',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="antialiased">
+
+  <!-- ==========================================
+       HEADER & BARRA DE NAVEGACIÓN
+       ========================================== -->
+  <header class="sticky top-0 z-40 w-full border-b border-dark-border dark:border-dark-border border-light-border bg-dark-bg/95 dark:bg-dark-bg/95 bg-light-bg/95 backdrop-blur-md transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo y Nombre -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-lg bg-dark-card dark:bg-dark-card bg-light-card border border-dark-border dark:border-dark-border border-light-border flex items-center justify-center font-bold text-base text-brand-emerald shadow-sm group-hover:border-brand-emerald transition-colors">
+          JM
+        </div>
+        <div>
+          <div class="font-bold text-base leading-tight text-dark-text dark:text-dark-text text-light-text tracking-tight">
+            Juan Marcelo
+          </div>
+          <div class="text-xs font-medium text-dark-muted dark:text-dark-muted text-light-muted">
+            Soluciones de Software para Negocios
+          </div>
+        </div>
+      </a>
+
+      <!-- Enlaces de navegación rápida (Escritorio) -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-dark-muted dark:text-dark-muted text-light-muted">
+        <a href="#sistema-unificado" class="hover:text-brand-emerald dark:hover:text-dark-text transition-colors">Sistema Unificado</a>
+        <a href="#mini-apps" class="hover:text-brand-emerald dark:hover:text-dark-text transition-colors">Mini Apps por Rubro</a>
+        <a href="#filosofia" class="hover:text-brand-emerald dark:hover:text-dark-text transition-colors">Cómo Trabajo</a>
+      </nav>
+
+      <!-- Acciones de cabecera -->
+      <div class="flex items-center gap-3">
+        <!-- Switch de Modo Oscuro / Claro -->
+        <button id="themeToggleBtn" onclick="toggleTheme()" aria-label="Cambiar modo de color" class="p-2 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card text-dark-muted dark:text-dark-muted text-light-muted hover:text-brand-emerald transition-all">
+          <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg id="moonIcon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+
+        <!-- Botón Contacto WhatsApp Directo (Cero Emojis según GEMINI.md) -->
+        <a href="https://api.whatsapp.com/send?text=Hola%20Juan%20Marcelo%2C%20estuve%20viendo%20tu%20web%20y%20me%20gustar%C3%ADa%20hacerte%20una%20consulta%20sobre%20tus%20sistemas%20de%20gesti%C3%B3n." target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all shadow-sm active:scale-95">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span>Escribir por WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       HERO PRINCIPAL
+       ========================================== -->
+  <section class="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden border-b border-dark-border dark:border-dark-border border-light-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Columna de Texto Principal -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- Titular Principal Aprobado -->
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-dark-text dark:text-dark-text text-light-text leading-[1.12]">
+            Software de gestión potente y simple, pensado para resolver tu día a día.
+          </h1>
+
+          <!-- Subtítulo Aprobado -->
+          <p class="text-lg sm:text-xl font-normal text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed max-w-2xl">
+            Control de stock, punto de venta ágil, programas de fidelización y herramientas especializadas creadas a la medida de tu trabajo diario.
+          </p>
+
+          <!-- Métricas de Valor / Pilares de Confianza (Lista Plana, Cero Tarjetas Anidadas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-dark-border dark:border-dark-border border-light-border">
+            <div>
+              <div class="text-xs uppercase tracking-wider font-semibold text-brand-emerald">Resiliencia</div>
+              <div class="text-sm font-semibold text-dark-text dark:text-dark-text text-light-text mt-0.5">100% Funcional Offline</div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider font-semibold text-brand-emerald">Claridad</div>
+              <div class="text-sm font-semibold text-dark-text dark:text-dark-text text-light-text mt-0.5">Sin tarifas en dólares</div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wider font-semibold text-brand-emerald">Atención</div>
+              <div class="text-sm font-semibold text-dark-text dark:text-dark-text text-light-text mt-0.5">Soporte directo personal</div>
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+            <a href="#sistema-unificado" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-base font-bold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all shadow-md active:scale-95 text-center">
+              <span>Ver Sistema de Gestión Unificado</span>
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </a>
+            
+            <a href="#mini-apps" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-base font-semibold text-dark-text dark:text-dark-text text-light-text bg-dark-card dark:bg-dark-card bg-light-card border border-dark-border dark:border-dark-border border-light-border hover:border-dark-borderLight rounded-lg transition-all text-center">
+              <span>Explorar Mini Apps</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Columna de Demostración Operativa (Diseño Plano de Impeccable) -->
+        <div class="lg:col-span-5">
+          <div class="rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card shadow-2xl overflow-hidden p-6 space-y-6">
+            
+            <!-- Encabezado de la simulación -->
+            <div class="flex items-center justify-between pb-4 border-b border-dark-border dark:border-dark-border border-light-border">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-brand-emerald"></span>
+                <span class="text-sm font-bold tracking-wide text-dark-text dark:text-dark-text text-light-text">Punto de Venta · Caja Abierta</span>
+              </div>
+              <span class="text-xs font-mono text-dark-muted dark:text-dark-muted text-light-muted">12:45 hs · En Línea</span>
+            </div>
+
+            <!-- Lista de Artículos en Mostrador -->
+            <div class="space-y-3">
+              <div class="text-xs font-bold uppercase tracking-wider text-dark-muted dark:text-dark-muted text-light-muted">
+                Ticket en curso
+              </div>
+              
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between items-center py-1">
+                  <div>
+                    <div class="font-semibold text-dark-text dark:text-dark-text text-light-text">Coca Cola 1.5L Retornable</div>
+                    <div class="text-xs text-dark-muted dark:text-dark-muted text-light-muted font-mono">2 un. x ARS $ 1.800,00</div>
+                  </div>
+                  <div class="font-mono font-bold text-dark-text dark:text-dark-text text-light-text tabular-nums">
+                    ARS $ 3.600,00
+                  </div>
+                </div>
+
+                <div class="flex justify-between items-center py-1 border-t border-dark-border/40 dark:border-dark-border/40 border-light-border/40">
+                  <div>
+                    <div class="font-semibold text-dark-text dark:text-dark-text text-light-text">Snacks Papas Clásicas 120g</div>
+                    <div class="text-xs text-dark-muted dark:text-dark-muted text-light-muted font-mono">1 un. x ARS $ 2.200,00</div>
+                  </div>
+                  <div class="font-mono font-bold text-dark-text dark:text-dark-text text-light-text tabular-nums">
+                    ARS $ 2.200,00
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resumen de Totales y Cifras -->
+            <div class="pt-4 border-t border-dark-border dark:border-dark-border border-light-border space-y-4">
+              <div class="flex justify-between items-baseline">
+                <span class="text-sm font-semibold text-dark-muted dark:text-dark-muted text-light-muted">Total a Cobrar</span>
+                <span class="text-2xl font-bold font-mono text-brand-emerald tabular-nums">
+                  ARS $ 5.800,00
+                </span>
+              </div>
+
+              <!-- Indicadores simples sin cajas anidadas -->
+              <div class="flex justify-between text-xs py-2 border-y border-dark-border/40 dark:border-dark-border/40 border-light-border/40">
+                <span class="text-dark-muted dark:text-dark-muted text-light-muted">Stock restante: <strong class="text-dark-text dark:text-dark-text text-light-text font-mono">42 unidades</strong></span>
+                <span class="text-dark-muted dark:text-dark-muted text-light-muted">Fidelización: <strong class="text-brand-amber font-mono">+58 puntos</strong></span>
+              </div>
+
+              <!-- Botón de Cobro Interactivo -->
+              <button onclick="simularCobro()" id="btnSimularCobro" class="w-full py-3 px-4 text-sm font-bold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span id="textoCobro">Cobrar y Emitir Ticket</span>
+              </button>
+
+              <p id="cobroFeedback" class="hidden text-xs text-center font-semibold text-brand-emerald pt-1">
+                Ticket #1042 emitido con éxito. Caja diaria sincronizada.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN ESTRELLA: SISTEMA DE GESTIÓN UNIFICADO (SGU)
+       ========================================== -->
+  <section id="sistema-unificado" class="py-20 md:py-28 border-b border-dark-border dark:border-dark-border border-light-border bg-dark-bg dark:bg-dark-bg bg-light-bg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Encabezado de Sección -->
+      <div class="max-w-3xl mb-16">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-dark-text dark:text-dark-text text-light-text mb-4">
+          Sistema de Gestión Unificado: el motor de control para tu negocio.
+        </h2>
+        <p class="text-base sm:text-lg text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+          Diseñado para resolver el trabajo diario en el mostrador: ventas a toda velocidad, arqueo de caja sin discrepancias y control de inventario exacto, sin depender de que haya Internet en el local.
+        </p>
+      </div>
+
+      <!-- Cuadrícula de 4 Pilares Fundamentales -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        
+        <!-- Pilar 1: Punto de Venta -->
+        <div class="p-6 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-emeraldBg text-brand-emerald flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-dark-text dark:text-dark-text text-light-text">Punto de Venta Ágil</h3>
+          <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+            Cobro rápido por código de barras o teclado numérico. Soporte para efectivo, transferencias, QR y emisión instantánea de comprobantes.
+          </p>
+        </div>
+
+        <!-- Pilar 2: Control de Stock -->
+        <div class="p-6 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-emeraldBg text-brand-emerald flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-dark-text dark:text-dark-text text-light-text">Inventario y Faltantes</h3>
+          <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+            Actualización inmediata en cada venta. Alertas automáticas antes de que un producto se agote y cálculo de margen de ganancia por artículo.
+          </p>
+        </div>
+
+        <!-- Pilar 3: Caja y Arqueo -->
+        <div class="p-6 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-emeraldBg text-brand-emerald flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-dark-text dark:text-dark-text text-light-text">Caja y Arqueo Diario</h3>
+          <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+            Apertura y cierre de turnos sin complicaciones. Registro de gastos menores, retiros y balance final sin planillas manuales.
+          </p>
+        </div>
+
+        <!-- Pilar 4: Modo Offline y Seguridad -->
+        <div class="p-6 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-emeraldBg text-brand-emerald flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-dark-text dark:text-dark-text text-light-text">Local-First y Nube</h3>
+          <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+            Funciona en la computadora del local sin Internet. Copias de seguridad automáticas y sincronización segura con Google Drive.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Barra de Acciones del SGU -->
+      <div class="p-6 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h4 class="text-base font-bold text-dark-text dark:text-dark-text text-light-text">
+            ¿Querés ver el Sistema de Gestión Unificado en acción?
+          </h4>
+          <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted">
+            Podés probar la demo completa en vivo con artículos y stock precargados.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <button onclick="abrirDemoModal('Sistema de Gestión Unificado', 'https://juancdgo.github.io/sistema-gestion-unificado/')" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all shadow-sm active:scale-95">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Probar Demo en Vivo</span>
+          </button>
+
+          <a href="https://api.whatsapp.com/send?text=Hola%20Juan%20Marcelo%2C%20quiero%20consultarte%20por%20la%20implementaci%C3%B3n%20del%20Sistema%20de%20Gesti%C3%B3n%20Unificado%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-dark-text dark:text-dark-text text-light-text border border-dark-border dark:border-dark-border border-light-border hover:border-dark-borderLight rounded-lg transition-all">
+            <span>Consultar Presupuesto</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SECCIÓN CATÁLOGO: MINI APPS DESTACADAS (4)
+       ========================================== -->
+  <section id="mini-apps" class="py-20 md:py-28 border-b border-dark-border dark:border-dark-border border-light-border bg-dark-bg/60 dark:bg-dark-bg/60 bg-light-bg/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Encabezado -->
+      <div class="max-w-3xl mb-16">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-dark-text dark:text-dark-text text-light-text mb-4">
+          Mini Apps especializadas por rubro.
+        </h2>
+        <p class="text-base sm:text-lg text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+          Herramientas pensadas para resolver las dinámicas concretas de tu actividad comercial: turnos, preventa en calle, fidelización y distribución.
+        </p>
+      </div>
+
+      <!-- Cuadrícula 2x2 de las 4 Mini Apps Principales -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        
+        <!-- App 1: Mini CRM Móvil & Preventa -->
+        <div class="p-6 sm:p-8 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs uppercase tracking-wider font-semibold text-brand-emerald">Calle & Distribución</span>
+              <span class="text-xs font-mono text-dark-muted dark:text-dark-muted text-light-muted">100% Offline</span>
+            </div>
+            <h3 class="text-xl font-bold text-dark-text dark:text-dark-text text-light-text">Mini CRM Móvil & Preventa</h3>
+            <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+              Diseñado para preventistas y distribuidores que recorren comercios. Registrá visitas, tomá pedidos en depósitos o almacenes sin señal de celular y exportá directo a Excel o Google Drive.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-2 text-xs font-medium text-dark-muted dark:text-dark-muted text-light-muted">
+              <span>• Toma de pedidos ágil</span>
+              <span>• Control de rutas</span>
+              <span>• Exportación CSV</span>
+            </div>
+          </div>
+
+          <div class="pt-4 flex items-center gap-3 border-t border-dark-border dark:border-dark-border border-light-border">
+            <button onclick="abrirDemoModal('Mini CRM Preventa', 'https://juancdgo.github.io/mini-crm-preventa/')" class="flex-1 py-2 px-4 text-xs sm:text-sm font-semibold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all text-center">
+              Probar Demo
+            </button>
+            <a href="https://juancdgo.github.io/mini-crm-preventa/" target="_blank" class="py-2 px-3 text-xs sm:text-sm font-medium text-dark-text dark:text-dark-text text-light-text border border-dark-border dark:border-dark-border border-light-border rounded-lg hover:border-dark-borderLight transition-all">
+              Abrir App
+            </a>
+          </div>
+        </div>
+
+        <!-- App 2: Club de Fidelidad & Sellos -->
+        <div class="p-6 sm:p-8 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs uppercase tracking-wider font-semibold text-brand-amber">Retención de Clientes</span>
+              <span class="text-xs font-mono text-dark-muted dark:text-dark-muted text-light-muted">Digital</span>
+            </div>
+            <h3 class="text-xl font-bold text-dark-text dark:text-dark-text text-light-text">Club de Fidelidad & Sellos</h3>
+            <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+              Reemplazá las tarjetas de cartón que se pierden. Sumá sellos y puntos digitales en cada compra desde el mostrador, incentivando a tus clientes a volver con premios claros y transparentes.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-2 text-xs font-medium text-dark-muted dark:text-dark-muted text-light-muted">
+              <span>• Sellos digitales</span>
+              <span>• Historial de canjes</span>
+              <span>• Escaneo por QR</span>
+            </div>
+          </div>
+
+          <div class="pt-4 flex items-center gap-3 border-t border-dark-border dark:border-dark-border border-light-border">
+            <button onclick="abrirDemoModal('Club de Fidelidad', 'https://juancdgo.github.io/fidelizacion/')" class="flex-1 py-2 px-4 text-xs sm:text-sm font-semibold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all text-center">
+              Probar Demo
+            </button>
+            <a href="https://juancdgo.github.io/fidelizacion/" target="_blank" class="py-2 px-3 text-xs sm:text-sm font-medium text-dark-text dark:text-dark-text text-light-text border border-dark-border dark:border-dark-border border-light-border rounded-lg hover:border-dark-borderLight transition-all">
+              Abrir App
+            </a>
+          </div>
+        </div>
+
+        <!-- App 3: Peluquería & Color -->
+        <div class="p-6 sm:p-8 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs uppercase tracking-wider font-semibold text-brand-emerald">Estética & Salones</span>
+              <span class="text-xs font-mono text-dark-muted dark:text-dark-muted text-light-muted">Turnos</span>
+            </div>
+            <h3 class="text-xl font-bold text-dark-text dark:text-dark-text text-light-text">Peluquería & Color</h3>
+            <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+              Agenda visual de citas sin huecos perdidos, ficha técnica con las fórmulas de tintura o tratamientos de cada cliente y recordatorios automáticos por WhatsApp listos para enviar.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-2 text-xs font-medium text-dark-muted dark:text-dark-muted text-light-muted">
+              <span>• Ficha técnica capilar</span>
+              <span>• Agenda por profesional</span>
+              <span>• Mensajes WhatsApp</span>
+            </div>
+          </div>
+
+          <div class="pt-4 flex items-center gap-3 border-t border-dark-border dark:border-dark-border border-light-border">
+            <button onclick="abrirDemoModal('Peluquería y Color', 'https://juancdgo.github.io/peluqueria/')" class="flex-1 py-2 px-4 text-xs sm:text-sm font-semibold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all text-center">
+              Probar Demo
+            </button>
+            <a href="https://juancdgo.github.io/peluqueria/" target="_blank" class="py-2 px-3 text-xs sm:text-sm font-medium text-dark-text dark:text-dark-text text-light-text border border-dark-border dark:border-dark-border border-light-border rounded-lg hover:border-dark-borderLight transition-all">
+              Abrir App
+            </a>
+          </div>
+        </div>
+
+        <!-- App 4: Distribuidora & Gestión de Bebidas -->
+        <div class="p-6 sm:p-8 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs uppercase tracking-wider font-semibold text-brand-emerald">Comercio & Packs</span>
+              <span class="text-xs font-mono text-dark-muted dark:text-dark-muted text-light-muted">Mayorista</span>
+            </div>
+            <h3 class="text-xl font-bold text-dark-text dark:text-dark-text text-light-text">Distribuidora & Bebidas</h3>
+            <p class="text-sm text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+              Manejo especializado de unidades sueltas, cajones y packs cerrados. Listas de precios diferenciadas por cliente mayorista o minorista y carga ágil para reparto.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-2 text-xs font-medium text-dark-muted dark:text-dark-muted text-light-muted">
+              <span>• Venta pack vs unidad</span>
+              <span>• Precios diferenciales</span>
+              <span>• Remitos rápidos</span>
+            </div>
+          </div>
+
+          <div class="pt-4 flex items-center gap-3 border-t border-dark-border dark:border-dark-border border-light-border">
+            <button onclick="abrirDemoModal('Distribuidora Bebidas', 'https://juancdgo.github.io/bebidas/')" class="flex-1 py-2 px-4 text-xs sm:text-sm font-semibold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all text-center">
+              Probar Demo
+            </button>
+            <a href="https://juancdgo.github.io/bebidas/" target="_blank" class="py-2 px-3 text-xs sm:text-sm font-medium text-dark-text dark:text-dark-text text-light-text border border-dark-border dark:border-dark-border border-light-border rounded-lg hover:border-dark-borderLight transition-all">
+              Abrir App
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Botón para desplegar más rubros -->
+      <div class="text-center">
+        <button id="toggleMoreAppsBtn" onclick="toggleMoreApps()" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card text-sm font-bold text-dark-text dark:text-dark-text text-light-text hover:border-brand-emerald transition-all shadow-sm">
+          <span id="moreAppsText">+ Ver más soluciones por rubro (8 aplicaciones adicionales)</span>
+          <svg id="moreAppsArrow" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Cuadrícula Expandible de Aplicaciones Adicionales -->
+      <div id="moreAppsContainer" class="hidden mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Rotisería -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Rotisería & Gastronomía</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Comandas a cocina, despacho por orden de pedido y control de insumos.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/rotiseria/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Barbería -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Barbería & Barbershop</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Turnos express, caja del sillón y ficha de clientes frecuentes.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/barberia/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Peluquería Canina -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Peluquería Canina & Mascotas</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Ficha clínica de la mascota, aviso de baño/corte y turnos.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/peluqueria-canina/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Gomería -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Gomería & Taller Mecánico</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Órdenes de servicio, repuestos utilizados y presupuestos rápidos.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/gomeria/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Manicura -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Manicura & Salón de Uñas</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Catálogo de diseños, reservas y registro de servicios realizados.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/manucura/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Dentista -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Consultorio Dental</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Historial odontológico, turnos clínicos y registro de pagos.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/dentista/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Costos Comida -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Costos & Escandallo</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Cálculo de costo real por porción, receta y rendimiento de insumos.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/costos-comida/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Calidad -->
+        <div class="p-5 rounded-lg border border-dark-border dark:border-dark-border border-light-border bg-dark-card dark:bg-dark-card bg-light-card space-y-2">
+          <div class="font-bold text-sm text-dark-text dark:text-dark-text text-light-text">Control de Calidad</div>
+          <p class="text-xs text-dark-muted dark:text-dark-muted text-light-muted">Auditorías internas, inspección de procesos y listas de verificación.</p>
+          <div class="pt-2">
+            <a href="https://juancdgo.github.io/calidad/" target="_blank" class="text-xs font-semibold text-brand-emerald hover:underline">Abrir demo &rarr;</a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FILOSOFÍA: CÓMO TRABAJO
+       ========================================== -->
+  <section id="filosofia" class="py-20 md:py-28 border-b border-dark-border dark:border-dark-border border-light-border bg-dark-bg dark:bg-dark-bg bg-light-bg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="max-w-3xl mb-16">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-dark-text dark:text-dark-text text-light-text mb-4">
+          Hecho a medida de cómo trabajás vos, no al revés.
+        </h2>
+        <p class="text-base sm:text-lg text-dark-muted dark:text-dark-muted text-light-muted leading-relaxed">
+          La mayoría de los sistemas del mercado fueron creados para oficinas con Internet permanente y cobran suscripciones caras por funciones que nadie usa. Mi enfoque es exactamente el opuesto.
+        </p>
+      </div>
+
+      <!-- Comparativa Limpia -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Sistemas Genéricos -->
+        <div class="p-6 rounded-xl border border-dark-border dark:border-dark-border border-light-border bg-dark-card/50 dark:bg-dark-card/50 bg-light-card space-y-4 opacity-75">
+          <div class="text-sm font-bold uppercase tracking-wider text-rose-400">Software tradicional de mercado</div>
+          <ul class="space-y-3 text-sm text-dark-muted dark:text-dark-muted text-light-muted">
+            <li class="flex items-start gap-2">
+              <span class="text-rose-400 font-bold">×</span>
+              <span>Suscripciones mensuales atadas al dólar que suben sin previo aviso.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-rose-400 font-bold">×</span>
+              <span>Si se corta la conexión en el barrio, el mostrador queda paralizado.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-rose-400 font-bold">×</span>
+              <span>Soporte automatizado con bots que no entienden la urgencia de tu caja.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-rose-400 font-bold">×</span>
+              <span>Sistemas pesados que exigen comprar computadoras nuevas para funcionar.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Soluciones de Juan Marcelo -->
+        <div class="p-6 rounded-xl border-2 border-brand-emerald dark:border-brand-emerald border-brand-emerald bg-dark-card dark:bg-dark-card bg-light-card space-y-4 shadow-lg">
+          <div class="text-sm font-bold uppercase tracking-wider text-brand-emerald">Mis soluciones para tu negocio</div>
+          <ul class="space-y-3 text-sm text-dark-text dark:text-dark-text text-light-text font-medium">
+            <li class="flex items-start gap-2">
+              <span class="text-brand-emerald font-bold">✓</span>
+              <span>Costos claros, sin ataduras a monedas extranjeras ni comisiones ocultas.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-brand-emerald font-bold">✓</span>
+              <span>Modo local-first: tu negocio factura y opera aún cuando se cae Internet.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-brand-emerald font-bold">✓</span>
+              <span>Comunicación directa conmigo: me decís qué necesitás y lo adaptamos.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-brand-emerald font-bold">✓</span>
+              <span>Código liviano que vuela en cualquier PC o celular sin trabas.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       CONTACTO & CIERRE
+       ========================================== -->
+  <section id="contacto" class="py-20 md:py-24 bg-dark-card dark:bg-dark-card bg-light-card border-b border-dark-border dark:border-dark-border border-light-border">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+      
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-dark-text dark:text-dark-text text-light-text">
+        ¿Tenés un negocio o querés una herramienta adaptada a tu forma de trabajar?
+      </h2>
+
+      <p class="text-base sm:text-lg text-dark-muted dark:text-dark-muted text-light-muted max-w-2xl mx-auto leading-relaxed">
+        Contame qué rubro tenés, cómo estás cobrando hoy y qué te gustaría mejorar. Te armo una demo adaptada a tu caso sin compromiso.
+      </p>
+
+      <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <!-- Botón de WhatsApp sin emojis conforme a regla GEMINI.md -->
+        <a href="https://api.whatsapp.com/send?text=Hola%20Juan%20Marcelo%2C%20estuve%20viendo%20tu%20web%20y%20me%20gustar%C3%ADa%20hacerte%20una%20consulta%20sobre%20tus%20sistemas%20de%20gesti%C3%B3n." target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-brand-emerald hover:bg-brand-emeraldHover rounded-lg transition-all shadow-md active:scale-95">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span>Escribirme directamente por WhatsApp</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FOOTER
+       ========================================== -->
+  <footer class="py-12 bg-dark-bg dark:bg-dark-bg bg-light-bg text-sm text-dark-muted dark:text-dark-muted text-light-muted">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div>
+        <div class="font-bold text-dark-text dark:text-dark-text text-light-text text-base">Juan Marcelo</div>
+        <div class="text-xs mt-1">Desarrollo de Soluciones de Gestión y Productividad para Negocios</div>
+      </div>
+
+      <div class="flex items-center gap-6 text-xs">
+        <a href="https://github.com/JuanCDgo" target="_blank" rel="noopener noreferrer" class="hover:text-brand-emerald transition-colors">
+          GitHub: @JuanCDgo
+        </a>
+        <span>Horario de Atención: Lun a Sáb (GMT-3)</span>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       MODAL DE DEMO EN VIVO
+       ========================================== -->
+  <div id="demoModal" class="hidden modal-backdrop-layer">
+    <div class="relative w-full max-w-5xl h-[85vh] bg-dark-card dark:bg-dark-card bg-light-card rounded-2xl border border-dark-border dark:border-dark-border border-light-border shadow-2xl flex flex-col overflow-hidden">
+      
+      <!-- Barra superior del modal -->
+      <div class="px-5 py-3.5 border-b border-dark-border dark:border-dark-border border-light-border flex items-center justify-between bg-dark-bg/80 dark:bg-dark-bg/80 bg-light-bg/80">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 rounded-full bg-brand-emerald"></div>
+          <span id="demoModalTitle" class="font-bold text-sm sm:text-base text-dark-text dark:text-dark-text text-light-text">
+            Demo en Vivo
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Botón abrir en pestaña externa -->
+          <a id="demoExternalLink" href="#" target="_blank" class="p-2 text-xs font-semibold rounded-lg border border-dark-border dark:border-dark-border border-light-border text-dark-text dark:text-dark-text text-light-text hover:bg-dark-border transition-colors flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            <span class="hidden sm:inline">Pantalla Completa</span>
+          </a>
+
+          <!-- Botón cerrar modal -->
+          <button onclick="cerrarDemoModal()" class="p-2 rounded-lg text-dark-muted dark:text-dark-muted text-light-muted hover:text-white transition-colors" aria-label="Cerrar ventana">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Iframe para cargar la app en vivo -->
+      <div class="flex-1 w-full bg-dark-bg dark:bg-dark-bg bg-light-bg relative">
+        <iframe id="demoIframe" src="" class="w-full h-full border-0" allow="clipboard-read; clipboard-write" title="Demo interactiva de aplicación"></iframe>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SCRIPTS DE INTERACTIVIDAD & CONTROL DE TEMA
+       ========================================== -->
+  <script>
+    // 1. Control de Modo Oscuro / Claro
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.add('dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      if (isDark) {
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('sunIcon').classList.add('hidden');
+        document.getElementById('moonIcon').classList.remove('hidden');
+      } else {
+        localStorage.setItem('theme', 'light');
+        document.getElementById('sunIcon').classList.remove('hidden');
+        document.getElementById('moonIcon').classList.add('hidden');
+      }
+    }
+
+    // 2. Simulación de Cobro en el Mockup
+    let cobrado = false;
+    function simularCobro() {
+      const feedback = document.getElementById('cobroFeedback');
+      const btn = document.getElementById('btnSimularCobro');
+      const texto = document.getElementById('textoCobro');
+
+      if (!cobrado) {
+        btn.classList.remove('bg-brand-emerald', 'hover:bg-brand-emeraldHover');
+        btn.classList.add('bg-zinc-700');
+        texto.innerText = 'Cobro Registrado';
+        feedback.classList.remove('hidden');
+        cobrado = true;
+      } else {
+        btn.classList.add('bg-brand-emerald', 'hover:bg-brand-emeraldHover');
+        btn.classList.remove('bg-zinc-700');
+        texto.innerText = 'Cobrar y Emitir Ticket';
+        feedback.classList.add('hidden');
+        cobrado = false;
+      }
+    }
+
+    // 3. Desplegar / Ocultar Más Aplicaciones
+    let moreAppsOpen = false;
+    function toggleMoreApps() {
+      const container = document.getElementById('moreAppsContainer');
+      const text = document.getElementById('moreAppsText');
+      const arrow = document.getElementById('moreAppsArrow');
+      moreAppsOpen = !moreAppsOpen;
+
+      if (moreAppsOpen) {
+        container.classList.remove('hidden');
+        text.innerText = '- Ocultar aplicaciones adicionales';
+        arrow.classList.add('rotate-180');
+      } else {
+        container.classList.add('hidden');
+        text.innerText = '+ Ver más soluciones por rubro (8 aplicaciones adicionales)';
+        arrow.classList.remove('rotate-180');
+      }
+    }
+
+    // 4. Modal de Demo en Vivo
+    function abrirDemoModal(titulo, url) {
+      const modal = document.getElementById('demoModal');
+      const titleElem = document.getElementById('demoModalTitle');
+      const iframe = document.getElementById('demoIframe');
+      const extLink = document.getElementById('demoExternalLink');
+
+      titleElem.innerText = 'Demo en Vivo · ' + titulo;
+      iframe.src = url;
+      extLink.href = url;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarDemoModal() {
+      const modal = document.getElementById('demoModal');
+      const iframe = document.getElementById('demoIframe');
+      iframe.src = '';
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        cerrarDemoModal();
+      }
+    });
+
+    // Iniciar tema al cargar
+    initTheme();
+  </script>
+
+</body>
+</html>
