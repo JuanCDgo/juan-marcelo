@@ -43,6 +43,7 @@ Soluciones de gestión robustas, ágiles y claras, desarrolladas pensando en la 
 - **Nombre:** Juan Marcelo.
 - **Titular Principal:** *"Software de gestión potente y simple, pensado para resolver tu día a día."*
 - **Subtítulo:** *"Control de stock, punto de venta ágil, programas de fidelización y herramientas especializadas creadas a la medida de tu trabajo diario."*
+- **Contacto Oficial:** `juancdgo@gmail.com` (contacto principal para consultas comerciales y demos a medida).
 - **Tono de Voz:** Seguro, profesional, empático con el comerciante, claro, sin jerga técnica vacía ni promesas infladas.
 
 ## Evidence on Hand

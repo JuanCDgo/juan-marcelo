@@ -21,6 +21,8 @@ colors:
   light-text-muted: "#94A3B8"
   
   accent-green: "#10B981"
+  accent-green-dark: "#047857"
+  accent-green-darker: "#065F46"
   accent-green-hover: "#059669"
   accent-green-glow: "rgba(16, 185, 129, 0.15)"
   accent-amber: "#F59E0B"
@@ -54,6 +56,10 @@ typography:
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: "0em"
+  kbd:
+    fontFamily: "'JetBrains Mono', monospace"
+    fontSize: "11px"
+    fontWeight: 500
   code:
     fontFamily: "'JetBrains Mono', monospace"
     fontSize: "0.875rem"
@@ -62,8 +68,9 @@ typography:
 rounded:
   xs: "4px"
   sm: "6px"
-  md: "10px"
-  lg: "16px"
+  md: "8px"
+  lg: "12px"
+  xl: "16px"
   full: "9999px"
 spacing:
   xs: "4px"
