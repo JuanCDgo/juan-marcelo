@@ -1350,17 +1350,23 @@
     }
 
     // ==========================================
-    // 7. Simulador Auto-Pilot en el Hero (Estilo Linear)
+    // 7. Simulador Auto-Pilot en el Hero (Estilo Linear Ágil)
     // ==========================================
     let autopilotEnabled = true;
+    let autopilotPausedByHover = false;
     let autopilotStep = 0;
     let autopilotInterval = null;
 
     function toggleAutopilot() {
       autopilotEnabled = !autopilotEnabled;
+      actualizarBadgeAutopilot();
+    }
+
+    function actualizarBadgeAutopilot() {
       const dot = document.getElementById('autopilotDot');
       const label = document.getElementById('autopilotLabel');
-      if (autopilotEnabled) {
+      if (!dot || !label) return;
+      if (autopilotEnabled && !autopilotPausedByHover) {
         dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
         label.innerText = 'En Vivo · Simulación';
       } else {
@@ -1370,7 +1376,7 @@
     }
 
     function stepAutopilot() {
-      if (!autopilotEnabled) return;
+      if (!autopilotEnabled || autopilotPausedByHover) return;
       autopilotStep = (autopilotStep + 1) % 4;
 
       if (autopilotStep === 0) {
@@ -1391,13 +1397,19 @@
     // Inicialización al cargar la página
     document.addEventListener('DOMContentLoaded', () => {
       initLinearSpotlights();
-      autopilotInterval = setInterval(stepAutopilot, 4500);
+      // Ciclo ágil a 1.8 segundos por paso para ritmo fluido estilo Linear
+      autopilotInterval = setInterval(stepAutopilot, 1800);
 
-      // Si el usuario interactúa con el mockup, pausar el auto-pilot suavemente
+      // Si el usuario coloca el cursor encima, pausa temporal; al salir reanuda
       const heroMockup = document.querySelector('.tab-view')?.parentElement;
       if (heroMockup) {
         heroMockup.addEventListener('mouseenter', () => {
-          if (autopilotEnabled) toggleAutopilot();
+          autopilotPausedByHover = true;
+          actualizarBadgeAutopilot();
+        });
+        heroMockup.addEventListener('mouseleave', () => {
+          autopilotPausedByHover = false;
+          actualizarBadgeAutopilot();
         });
       }
     });
