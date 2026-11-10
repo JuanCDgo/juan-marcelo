@@ -62,6 +62,34 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
+    /* Contenedor Stack del Terminal Hero (0px Layout Shift entre pestañas) */
+    .tab-view-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+    }
+    .tab-view {
+      grid-column: 1 / -1;
+      grid-row: 1 / -1;
+      width: 100%;
+      transition: opacity 0.22s ease, visibility 0.22s ease;
+    }
+    .tab-view.is-active-tab {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      z-index: 10;
+    }
+    .tab-view.is-inactive-tab {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    #feedbackLinear.is-feedback-visible {
+      opacity: 1;
+    }
+
     /* Tarjetas Interactivas con Spotlight Linear y Padding Explícito */
     .linear-card {
       position: relative;
@@ -70,6 +98,8 @@
       border-radius: 16px;
       padding: 28px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      translate: 0 0;
+      transform: translateY(0);
       transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
       overflow: hidden;
     }
@@ -93,35 +123,202 @@
       opacity: 1;
     }
 
-    /* Animaciones de Micro-interacción en Hover */
-    @keyframes laserSweep {
-      0% { top: 0%; opacity: 0; }
-      15% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { top: 100%; opacity: 0; }
+    /* Scroll Reveal progresivo y compatible con prefers-reduced-motion */
+    @media (prefers-reduced-motion: no-preference) {
+      html.js-motion-ready .scroll-reveal {
+        opacity: 0;
+        translate: 0 22px;
+        transition:
+          opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          translate 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.25s ease,
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      html.js-motion-ready .scroll-reveal.is-revealed {
+        opacity: 1;
+        translate: 0 0;
+      }
+      html.js-motion-ready .scroll-reveal.is-revealed.card-muted {
+        opacity: 0.78;
+      }
     }
+
+    /* Spotlight & Elevación activa por scroll en celulares / touch */
+    @media (hover: none), (max-width: 1023px) {
+      .linear-card.in-view {
+        border-color: rgba(16, 185, 129, 0.34);
+        transform: translateY(-2px);
+        box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65);
+      }
+      .linear-card.in-view::before {
+        opacity: 1;
+        background: radial-gradient(380px circle at 50% 18%, rgba(16, 185, 129, 0.15), transparent 55%);
+      }
+    }
+    body.touch-or-mobile .linear-card.in-view {
+      border-color: rgba(16, 185, 129, 0.34);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65);
+    }
+    body.touch-or-mobile .linear-card.in-view::before {
+      opacity: 1;
+      background: radial-gradient(380px circle at 50% 18%, rgba(16, 185, 129, 0.15), transparent 55%);
+    }
+
+    /* Animaciones de Micro-interacción (Hover desktop + Scroll en vivo móvil) */
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes laserSweep {
+        0% { top: 0%; opacity: 0; }
+        15% { opacity: 1; }
+        85% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+      }
+      .linear-card:hover .laser-line,
+      .auto-laser .laser-line {
+        animation: laserSweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      /* Pulso de Paquetes en Sincronización Local-First */
+      @keyframes packetFlow {
+        0% { left: 0%; opacity: 0; }
+        20% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { left: 100%; opacity: 0; }
+      }
+      .linear-card:hover .packet-dot {
+        animation: packetFlow 1.8s ease-in-out infinite;
+      }
+
+      /* Sellos elásticos (Fidelidad) */
+      @keyframes stampPop {
+        0% { transform: scale(0.5) rotate(-18deg); opacity: 0; }
+        70% { transform: scale(1.25) rotate(6deg); opacity: 1; }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      }
+      @keyframes mobileStampNumberLoop {
+        0%, 26% { opacity: 1; transform: scale(1); }
+        32%, 88% { opacity: 0; transform: scale(0.5); }
+        94%, 100% { opacity: 1; transform: scale(1); }
+      }
+      @keyframes mobileStampStarLoop {
+        0%, 26% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+        38% { opacity: 1; transform: scale(1.28) rotate(8deg); }
+        44%, 86% { opacity: 1; transform: scale(1) rotate(0deg); }
+        92%, 100% { opacity: 0; transform: scale(0.4); }
+      }
+      .group:hover .stamp-slot-star {
+        animation: stampPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+
+      @keyframes mobileStockBarLoop {
+        0%, 15% { transform: scaleX(0.8); background-color: #10B981; }
+        45%, 80% { transform: scaleX(0.18); background-color: #EF4444; }
+        95%, 100% { transform: scaleX(0.8); background-color: #10B981; }
+      }
+      @keyframes mobileAlertChipLoop {
+        0%, 30% { opacity: 0; transform: translateY(4px); }
+        45%, 80% { opacity: 1; transform: translateY(0); }
+        95%, 100% { opacity: 0; transform: translateY(4px); }
+      }
+
+      @keyframes mobileRouteLoop {
+        0%, 15% { transform: scaleX(0.55); }
+        55%, 85% { transform: scaleX(0.94); }
+        100% { transform: scaleX(0.55); }
+      }
+      @keyframes mobileEmeraldBreathe {
+        0%, 100% { color: #10B981; transform: scale(1); }
+        50% { color: #34D399; transform: scale(1.04); }
+      }
+      @keyframes mobileBadgeBreathe {
+        0%, 100% { background-color: transparent; }
+        50% { background-color: rgba(16, 185, 129, 0.16); }
+      }
+
+      /* Activación automática por Scroll (.in-view) en dispositivos Touch o viewports móviles */
+      @media (hover: none), (max-width: 1023px) {
+        .linear-card.in-view .laser-line {
+          animation: laserSweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .linear-card.in-view .packet-dot {
+          animation: packetFlow 1.8s ease-in-out infinite;
+        }
+        .linear-card.in-view .stock-bar-indicator {
+          animation: mobileStockBarLoop 3.6s ease-in-out infinite;
+        }
+        .linear-card.in-view .stock-alert-chip {
+          animation: mobileAlertChipLoop 3.6s ease-in-out infinite;
+        }
+        .group.in-view .stamp-slot-number {
+          animation: mobileStampNumberLoop 3.6s ease-in-out infinite;
+        }
+        .group.in-view .stamp-slot-star {
+          animation: mobileStampStarLoop 3.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+        }
+        .linear-card.in-view .route-progress-fill {
+          animation: mobileRouteLoop 3.4s ease-in-out infinite;
+        }
+        .linear-card.in-view .hover-highlight-green,
+        .linear-card.in-view .scanner-price,
+        .linear-card.in-view .formula-highlight,
+        .linear-card.in-view .pack-highlight {
+          animation: mobileEmeraldBreathe 2.8s ease-in-out infinite;
+        }
+        .linear-card.in-view .arqueo-badge {
+          animation: mobileBadgeBreathe 2.8s ease-in-out infinite;
+        }
+      }
+
+      body.touch-or-mobile .linear-card.in-view .laser-line {
+        animation: laserSweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      body.touch-or-mobile .linear-card.in-view .packet-dot {
+        animation: packetFlow 1.8s ease-in-out infinite;
+      }
+      body.touch-or-mobile .linear-card.in-view .stock-bar-indicator {
+        animation: mobileStockBarLoop 3.6s ease-in-out infinite;
+      }
+      body.touch-or-mobile .linear-card.in-view .stock-alert-chip {
+        animation: mobileAlertChipLoop 3.6s ease-in-out infinite;
+      }
+      body.touch-or-mobile .group.in-view .stamp-slot-number {
+        animation: mobileStampNumberLoop 3.6s ease-in-out infinite;
+      }
+      body.touch-or-mobile .group.in-view .stamp-slot-star {
+        animation: mobileStampStarLoop 3.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+      }
+      body.touch-or-mobile .linear-card.in-view .route-progress-fill {
+        animation: mobileRouteLoop 3.4s ease-in-out infinite;
+      }
+      body.touch-or-mobile .linear-card.in-view .hover-highlight-green,
+      body.touch-or-mobile .linear-card.in-view .scanner-price,
+      body.touch-or-mobile .linear-card.in-view .formula-highlight,
+      body.touch-or-mobile .linear-card.in-view .pack-highlight {
+        animation: mobileEmeraldBreathe 2.8s ease-in-out infinite;
+      }
+      body.touch-or-mobile .linear-card.in-view .arqueo-badge {
+        animation: mobileBadgeBreathe 2.8s ease-in-out infinite;
+      }
+    }
+
     .laser-line {
       position: absolute;
       left: 0;
       right: 0;
       height: 2px;
       background: linear-gradient(90deg, transparent, #10B981, transparent);
-      
       opacity: 0;
       pointer-events: none;
     }
-    .linear-card:hover .laser-line,
-    .auto-laser .laser-line {
-      animation: laserSweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    .scanner-price {
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .linear-card:hover .scanner-price {
+      color: #34D399;
+      transform: scale(1.03);
     }
 
-    /* Pulso de Paquetes en Sincronización Local-First */
-    @keyframes packetFlow {
-      0% { left: 0%; opacity: 0; }
-      20% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { left: 100%; opacity: 0; }
-    }
     .packet-dot {
       position: absolute;
       top: -3px;
@@ -129,30 +326,44 @@
       height: 7px;
       border-radius: 9999px;
       background-color: #10B981;
-      
       opacity: 0;
     }
-    .linear-card:hover .packet-dot {
-      animation: packetFlow 1.8s ease-in-out infinite;
+    .sync-track {
+      transition: background-color 0.35s ease;
+    }
+    .linear-card:hover .sync-track,
+    .linear-card.in-view .sync-track {
+      background-color: rgba(16, 185, 129, 0.45);
     }
 
-    /* Sellos elásticos */
-    @keyframes stampPop {
-      0% { transform: scale(0.6) rotate(-15deg); opacity: 0; }
-      70% { transform: scale(1.25) rotate(6deg); opacity: 1; }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    .stamp-slot-number {
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
-    .stamp-animated-active {
-      animation: stampPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    .stamp-slot-star {
+      opacity: 0;
+    }
+    .group:hover .stamp-slot-number {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    .stamp-reward-hint {
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .group:hover .stamp-reward-hint {
+      color: #FCD34D;
+      transform: scale(1.02);
     }
 
-    /* Barra de stock dinámico */
+    /* Barra de stock dinámico (GPU Compositor ScaleX) */
     .stock-bar-indicator {
-      width: 80%;
-      transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.7s ease;
+      width: 100%;
+      transform-origin: left;
+      transform: scaleX(0.8);
+      background-color: #10B981;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.7s ease;
     }
     .linear-card:hover .stock-bar-indicator {
-      width: 15%;
+      transform: scaleX(0.18);
       background-color: #EF4444;
     }
     .stock-alert-chip {
@@ -165,14 +376,44 @@
       transform: translateY(0);
     }
 
-    /* Odometer & Highlight en Hover */
+    /* Caja, Preventa, Peluquería y Bebidas Micro-interacciones */
     .hover-highlight-green {
       transition: color 0.3s ease, transform 0.3s ease;
     }
+    .arqueo-badge {
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
     .linear-card:hover .hover-highlight-green {
       color: #34D399;
-      transform: scale(1.02);
+      transform: scale(1.03);
     }
+    .linear-card:hover .arqueo-badge {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34D399;
+    }
+
+    .route-progress-fill {
+      width: 100%;
+      transform-origin: left;
+      transform: scaleX(0.62);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .linear-card:hover .route-progress-fill {
+      transform: scaleX(0.92);
+    }
+
+    .formula-highlight,
+    .pack-highlight {
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .linear-card:hover .formula-highlight,
+    .linear-card:hover .pack-highlight {
+      color: #34D399;
+      transform: scale(1.03);
+    }
+
     .hover-reveal-box {
       opacity: 0;
       max-height: 0;
@@ -276,6 +517,11 @@
       }
     }
   </script>
+  <script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('js-motion-ready');
+    }
+  </script>
 </head>
 <body class="bg-dark-bg text-dark-text antialiased">
 
@@ -368,10 +614,10 @@
       <!-- ==========================================
            MOCKUP OPERATIVO CON PESTAÑAS (Estructura Plana sin anidamientos)
            ========================================== -->
-      <div class="mt-14 max-w-5xl mx-auto rounded-2xl border border-dark-border bg-dark-card shadow-2xl overflow-hidden">
+      <div id="heroTerminal" class="mt-14 max-w-5xl mx-auto rounded-2xl border border-dark-border bg-dark-card shadow-2xl overflow-hidden">
         
         <!-- Barra de Control del Terminal / Pestañas de Vista -->
-        <div class="px-5 py-3.5 border-b border-dark-border bg-dark-bg/90 flex flex-wrap items-center justify-between gap-3">
+        <div class="px-4 sm:px-5 py-3.5 border-b border-dark-border bg-dark-bg/90 flex flex-wrap items-center justify-between gap-3">
           
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-1.5">
@@ -384,23 +630,23 @@
 
           <!-- Pestañas Interactivas -->
           <div class="flex items-center gap-1 text-xs">
-            <button onclick="switchTab('pos')" id="tab-pos" class="tab-btn px-3 py-1.5 rounded font-bold text-white bg-zinc-800 transition-all flex items-center gap-1.5">
+            <button onclick="switchTab('pos')" id="tab-pos" class="tab-btn px-3 py-1.5 rounded font-semibold text-white bg-zinc-800 transition-colors flex items-center gap-1.5 whitespace-nowrap">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               <span>Punto de Venta</span>
             </button>
-            <button onclick="switchTab('stock')" id="tab-stock" class="tab-btn px-3 py-1.5 rounded font-medium text-dark-muted hover:text-white transition-all flex items-center gap-1.5">
+            <button onclick="switchTab('stock')" id="tab-stock" class="tab-btn px-3 py-1.5 rounded font-semibold text-dark-muted hover:text-white transition-colors flex items-center gap-1.5 whitespace-nowrap">
               <span>Stock en Vivo</span>
             </button>
-            <button onclick="switchTab('caja')" id="tab-caja" class="tab-btn px-3 py-1.5 rounded font-medium text-dark-muted hover:text-white transition-all flex items-center gap-1.5">
+            <button onclick="switchTab('caja')" id="tab-caja" class="tab-btn px-3 py-1.5 rounded font-semibold text-dark-muted hover:text-white transition-colors flex items-center gap-1.5 whitespace-nowrap">
               <span>Arqueo de Caja</span>
             </button>
           </div>
 
           <!-- Simulador en Vivo / Atajos -->
           <div class="flex items-center gap-2.5">
-            <button onclick="toggleAutopilot()" id="autopilotBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-mono text-emerald-400 hover:bg-emerald-900/50 transition-colors shadow-sm" title="Pausar o reanudar simulación automática">
+            <button onclick="toggleAutopilot()" id="autopilotBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-mono text-emerald-400 hover:bg-emerald-900/50 transition-colors shadow-sm whitespace-nowrap" title="Pausar o reanudar simulación automática">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" id="autopilotDot"></span>
-              <span id="autopilotLabel">En Vivo · Simulación</span>
+              <span id="autopilotLabel" class="inline-block min-w-[125px] text-left">En Vivo · Simulación</span>
             </button>
             <div class="hidden sm:flex items-center gap-1.5">
               <span class="kbd-chip">F10 Cobrar</span>
@@ -410,156 +656,178 @@
 
         </div>
 
-        <!-- PANTALLA 1: PUNTO DE VENTA (Filas planas con divisores, cero cajas anidadas) -->
-        <div id="view-pos" class="tab-view p-6 sm:p-8 space-y-6">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- Lista de Artículos -->
-            <div class="lg:col-span-7 space-y-3">
-              <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-dark-muted pb-2 border-b border-dark-border">
-                <span>Artículos en Mostrador</span>
-                <span>Ticket #1042</span>
+        <!-- Stack Grid Fijo (0px Layout Shift al cambiar entre pantallas) -->
+        <div class="tab-view-stack">
+
+          <!-- PANTALLA 1: PUNTO DE VENTA (Filas planas con divisores, cero cajas anidadas) -->
+          <div id="view-pos" class="tab-view is-active-tab p-6 sm:p-8 flex flex-col justify-between">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              <!-- Lista de Artículos -->
+              <div class="lg:col-span-7 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-dark-muted pb-2 border-b border-dark-border">
+                  <span>Artículos en Mostrador</span>
+                  <span>Ticket #1042</span>
+                </div>
+
+                <div class="divide-y divide-dark-border text-sm">
+                  <div class="py-3 flex justify-between items-center gap-3">
+                    <div>
+                      <div class="font-bold text-dark-text">Gaseosa Cola 1.5L Retornable</div>
+                      <div class="text-xs text-dark-muted font-mono">2 unidades x ARS $ 1.800,00</div>
+                    </div>
+                    <div class="font-mono font-bold text-dark-text tabular-nums text-base shrink-0 whitespace-nowrap">
+                      ARS $ 3.600,00
+                    </div>
+                  </div>
+
+                  <div class="py-3 flex justify-between items-center gap-3">
+                    <div>
+                      <div class="font-bold text-dark-text">Snacks Papas Clásicas 120g</div>
+                      <div class="text-xs text-dark-muted font-mono">1 unidad x ARS $ 2.200,00</div>
+                    </div>
+                    <div class="font-mono font-bold text-dark-text tabular-nums text-base shrink-0 whitespace-nowrap">
+                      ARS $ 2.200,00
+                    </div>
+                  </div>
+
+                  <div class="py-3 flex justify-between items-center gap-3">
+                    <div>
+                      <div class="font-bold text-dark-text">Galletitas Rellenas Vainilla 108g</div>
+                      <div class="text-xs text-dark-muted font-mono">2 unidades x ARS $ 950,00</div>
+                    </div>
+                    <div class="font-mono font-bold text-dark-text tabular-nums text-base shrink-0 whitespace-nowrap">
+                      ARS $ 1.900,00
+                    </div>
+                  </div>
+                </div>
               </div>
 
+              <!-- Panel de Cobro (Columna Integrada con Divisor Lateral, Cero Tarjeta Anidada) -->
+              <div class="lg:col-span-5 lg:border-l lg:border-dark-border lg:pl-8 space-y-4">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-dark-muted">Total a Facturar</span>
+                  <div class="text-3xl font-extrabold font-mono text-emerald-400 tabular-nums mt-1">
+                    ARS $ 7.700,00
+                  </div>
+                </div>
+
+                <!-- Métricas operativas -->
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-dark-border text-xs">
+                  <div>
+                    <span class="text-dark-muted block">Método sugerido</span>
+                    <strong class="text-dark-text font-mono">QR / Transferencia</strong>
+                  </div>
+                  <div>
+                    <span class="text-dark-muted block">Puntos cliente</span>
+                    <strong class="text-amber-400 font-mono">+77 puntos</strong>
+                  </div>
+                </div>
+
+                <!-- Botón de Simulación de Cobro -->
+                <button onclick="simularCobroLinear()" id="btnSimularCobroLinear" class="w-full py-3.5 px-4 text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <span id="textoCobroLinear">Cobrar y Emitir Comprobante</span>
+                </button>
+
+                <!-- Espacio fijo reservado para feedback (0px jump) -->
+                <div class="h-6 flex items-center justify-center">
+                  <p id="feedbackLinear" class="opacity-0 transition-opacity duration-200 text-xs text-center font-bold text-emerald-400">
+                    ✓ Ticket #1042 emitido en 0.2s · Stock actualizado.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- PANTALLA 2: STOCK EN VIVO -->
+          <div id="view-stock" class="tab-view is-inactive-tab p-6 sm:p-8 flex flex-col justify-between gap-4">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-dark-muted pb-2 border-b border-dark-border gap-2">
+                <span>Inventario y Alertas de Faltantes</span>
+                <span class="text-emerald-400 whitespace-nowrap">Monitoreo en Vivo</span>
+              </div>
+              
               <div class="divide-y divide-dark-border text-sm">
-                <div class="py-3 flex justify-between items-center">
+                <div class="py-3 flex justify-between items-center gap-3">
                   <div>
                     <div class="font-bold text-dark-text">Gaseosa Cola 1.5L Retornable</div>
-                    <div class="text-xs text-dark-muted font-mono">2 unidades x ARS $ 1.800,00</div>
+                    <div class="text-xs text-dark-muted">Proveedor: Embotelladora Central · Código: 77912345</div>
                   </div>
-                  <div class="font-mono font-bold text-dark-text tabular-nums text-base">
-                    ARS $ 3.600,00
+                  <div class="text-right shrink-0">
+                    <div class="font-mono font-bold text-emerald-400 whitespace-nowrap">42 u. disponibles</div>
+                    <div class="text-xs text-dark-muted font-mono">Stock óptimo</div>
                   </div>
                 </div>
 
-                <div class="py-3 flex justify-between items-center">
+                <div class="py-3 flex justify-between items-center gap-3">
                   <div>
                     <div class="font-bold text-dark-text">Snacks Papas Clásicas 120g</div>
-                    <div class="text-xs text-dark-muted font-mono">1 unidad x ARS $ 2.200,00</div>
+                    <div class="text-xs text-dark-muted">Proveedor: Distribuidora Sur · Código: 77998765</div>
                   </div>
-                  <div class="font-mono font-bold text-dark-text tabular-nums text-base">
-                    ARS $ 2.200,00
+                  <div class="text-right shrink-0">
+                    <div class="font-mono font-bold text-rose-400 text-xs sm:text-sm whitespace-nowrap">3 u. restantes</div>
+                    <div class="text-[11px] sm:text-xs text-rose-300 font-mono whitespace-nowrap">¡Alerta! · Reponer hoy</div>
                   </div>
                 </div>
 
-                <div class="py-3 flex justify-between items-center">
+                <div class="py-3 flex justify-between items-center gap-3">
                   <div>
                     <div class="font-bold text-dark-text">Galletitas Rellenas Vainilla 108g</div>
-                    <div class="text-xs text-dark-muted font-mono">2 unidades x ARS $ 950,00</div>
+                    <div class="text-xs text-dark-muted">Proveedor: Golosinas Norte · Código: 77945678</div>
                   </div>
-                  <div class="font-mono font-bold text-dark-text tabular-nums text-base">
-                    ARS $ 1.900,00
+                  <div class="text-right shrink-0">
+                    <div class="font-mono font-bold text-emerald-400 whitespace-nowrap">28 u. disponibles</div>
+                    <div class="text-xs text-dark-muted font-mono">Stock óptimo</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Panel de Cobro (Columna Integrada con Divisor Lateral, Cero Tarjeta Anidada) -->
-            <div class="lg:col-span-5 lg:border-l lg:border-dark-border lg:pl-8 space-y-5">
-              <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-dark-muted">Total a Facturar</span>
-                <div class="text-3xl font-extrabold font-mono text-emerald-400 tabular-nums mt-1">
-                  ARS $ 7.700,00
+            <div class="pt-3 border-t border-dark-border text-xs flex flex-wrap justify-between items-center text-dark-muted gap-2">
+              <span>Artículos activos: <strong class="text-dark-text font-mono">1.240 ítems</strong></span>
+              <span class="text-emerald-400 font-mono font-medium">● 98.4% Disponibilidad en góndola</span>
+            </div>
+          </div>
+
+          <!-- PANTALLA 3: ARQUEO DE CAJA -->
+          <div id="view-caja" class="tab-view is-inactive-tab p-6 sm:p-8 flex flex-col justify-between gap-4">
+            <div class="space-y-4">
+              <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-dark-muted pb-2 border-b border-dark-border gap-2">
+                <span>Arqueo de Turno Actual</span>
+                <span class="text-dark-muted font-mono whitespace-nowrap">Turno Mañana · Op. Juan</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 py-4 border-y border-dark-border">
+                <div class="space-y-1">
+                  <span class="text-xs text-dark-muted block">Efectivo en Cajón</span>
+                  <strong class="text-xl font-bold font-mono text-dark-text tabular-nums whitespace-nowrap">ARS $ 48.500,00</strong>
+                </div>
+                <div class="space-y-1 sm:border-l sm:border-dark-border sm:pl-6">
+                  <span class="text-xs text-dark-muted block">Cobros con QR / Transferencias</span>
+                  <strong class="text-xl font-bold font-mono text-emerald-400 tabular-nums whitespace-nowrap">ARS $ 92.400,00</strong>
+                </div>
+                <div class="space-y-1 sm:border-l sm:border-dark-border sm:pl-6">
+                  <span class="text-xs text-dark-muted block">Total Facturado</span>
+                  <strong class="text-xl font-bold font-mono text-cyan-400 tabular-nums whitespace-nowrap">ARS $ 140.900,00</strong>
                 </div>
               </div>
 
-              <!-- Métricas operativas -->
-              <div class="grid grid-cols-2 gap-3 pt-3 border-t border-dark-border text-xs">
-                <div>
-                  <span class="text-dark-muted block">Método sugerido</span>
-                  <strong class="text-dark-text font-mono">QR / Transferencia</strong>
-                </div>
-                <div>
-                  <span class="text-dark-muted block">Puntos cliente</span>
-                  <strong class="text-amber-400 font-mono">+77 puntos</strong>
-                </div>
-              </div>
-
-              <!-- Botón de Simulación de Cobro -->
-              <button onclick="simularCobroLinear()" id="btnSimularCobroLinear" class="w-full py-3.5 px-4 text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span id="textoCobroLinear">Cobrar y Emitir Comprobante</span>
-              </button>
-
-              <p id="feedbackLinear" class="hidden text-xs text-center font-bold text-emerald-400">
-                ✓ Ticket #1042 emitido en 0.2s · Stock actualizado.
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- PANTALLA 2: STOCK EN VIVO -->
-        <div id="view-stock" class="tab-view hidden p-6 sm:p-8 space-y-3">
-          <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-dark-muted pb-2 border-b border-dark-border">
-            <span>Inventario y Alertas de Faltantes</span>
-            <span class="text-emerald-400">Monitoreo en Tiempo Real</span>
-          </div>
-          
-          <div class="divide-y divide-dark-border text-sm">
-            <div class="py-3 flex justify-between items-center">
-              <div>
-                <div class="font-bold text-dark-text">Gaseosa Cola 1.5L Retornable</div>
-                <div class="text-xs text-dark-muted">Proveedor: Embotelladora Central · Código: 77912345</div>
-              </div>
-              <div class="text-right">
-                <div class="font-mono font-bold text-emerald-400">42 u. disponibles</div>
-                <div class="text-xs text-dark-muted font-mono">Stock óptimo</div>
+              <div class="py-2 text-xs flex justify-between items-center gap-2">
+                <span class="text-dark-muted">Diferencia de arqueo de caja vs sistema:</span>
+                <strong class="text-emerald-400 font-mono text-sm whitespace-nowrap">ARS $ 0,00 (Caja Exacta)</strong>
               </div>
             </div>
 
-            <div class="py-3 flex justify-between items-center">
-              <div>
-                <div class="font-bold text-dark-text">Snacks Papas Clásicas 120g</div>
-                <div class="text-xs text-dark-muted">Proveedor: Distribuidora Sur · Código: 77998765</div>
-              </div>
-              <div class="text-right">
-                <div class="font-mono font-bold text-rose-400">3 u. restantes (¡Alerta!)</div>
-                <div class="text-xs text-rose-300 font-mono">Reponer hoy</div>
-              </div>
-            </div>
-
-            <div class="py-3 flex justify-between items-center">
-              <div>
-                <div class="font-bold text-dark-text">Galletitas Rellenas Vainilla 108g</div>
-                <div class="text-xs text-dark-muted">Proveedor: Golosinas Norte · Código: 77945678</div>
-              </div>
-              <div class="text-right">
-                <div class="font-mono font-bold text-emerald-400">28 u. disponibles</div>
-                <div class="text-xs text-dark-muted font-mono">Stock óptimo</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PANTALLA 3: ARQUEO DE CAJA -->
-        <div id="view-caja" class="tab-view hidden p-6 sm:p-8 space-y-4">
-          <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-dark-muted pb-2 border-b border-dark-border">
-            <span>Arqueo de Turno Actual</span>
-            <span class="text-dark-muted font-mono">Turno Mañana · Operador Juan</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 py-4 border-y border-dark-border">
-            <div class="space-y-1">
-              <span class="text-xs text-dark-muted block">Efectivo en Cajón</span>
-              <strong class="text-xl font-bold font-mono text-dark-text tabular-nums">ARS $ 48.500,00</strong>
-            </div>
-            <div class="space-y-1 sm:border-l sm:border-dark-border sm:pl-6">
-              <span class="text-xs text-dark-muted block">Cobros con QR / Transferencias</span>
-              <strong class="text-xl font-bold font-mono text-emerald-400 tabular-nums">ARS $ 92.400,00</strong>
-            </div>
-            <div class="space-y-1 sm:border-l sm:border-dark-border sm:pl-6">
-              <span class="text-xs text-dark-muted block">Total Facturado</span>
-              <strong class="text-xl font-bold font-mono text-cyan-400 tabular-nums">ARS $ 140.900,00</strong>
+            <div class="pt-3 border-t border-dark-border text-xs flex flex-wrap justify-between items-center text-dark-muted gap-2">
+              <span>Comprobante de cierre: <strong class="font-mono text-dark-text">#CR-00289</strong></span>
+              <span class="font-mono text-emerald-400">Respaldo automático enviado a Drive</span>
             </div>
           </div>
 
-          <div class="py-3 border-t border-dark-border text-xs flex justify-between items-center">
-            <span class="text-dark-muted">Diferencia de arqueo de caja vs sistema:</span>
-            <strong class="text-emerald-400 font-mono text-sm">ARS $ 0,00 (Caja Exacta)</strong>
-          </div>
         </div>
 
       </div>
@@ -574,7 +842,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Encabezado de Sección -->
-      <div class="max-w-3xl mb-16 space-y-3">
+      <div class="max-w-3xl mb-16 space-y-3 scroll-reveal">
         <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-dark-text">
           Sistema de Gestión Unificado: el motor de control para tu negocio.
         </h2>
@@ -587,7 +855,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
         
         <!-- Pilar 1: Punto de Venta con Escaneo Láser -->
-        <div class="linear-card flex flex-col justify-between space-y-4 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-4 group">
           <div class="space-y-3">
             <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -621,13 +889,13 @@
             </div>
             <div class="flex items-center justify-between text-xs pt-0.5">
               <span class="text-dark-text font-medium truncate">Gaseosa Cola 1.5L</span>
-              <span class="font-mono text-emerald-400 font-bold tabular-nums">ARS $ 1.800,00</span>
+              <span class="font-mono text-emerald-400 font-bold tabular-nums scanner-price">ARS $ 1.800,00</span>
             </div>
           </div>
         </div>
 
         <!-- Pilar 2: Inventario con Alerta de Agotamiento -->
-        <div class="linear-card flex flex-col justify-between space-y-4 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-4 group">
           <div class="space-y-3">
             <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -647,7 +915,7 @@
               <span class="font-mono text-xs text-amber-400 font-bold">12 u. en stock</span>
             </div>
             <div class="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
-              <div class="h-full rounded-full bg-emerald-500 stock-bar-indicator"></div>
+              <div class="h-full rounded-full stock-bar-indicator"></div>
             </div>
             <div class="flex items-center justify-between text-[11px] text-dark-muted pt-0.5">
               <span>Mínimo: 4 u.</span>
@@ -657,7 +925,7 @@
         </div>
 
         <!-- Pilar 3: Caja y Arqueo Diario con Odómetro -->
-        <div class="linear-card flex flex-col justify-between space-y-4 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-4 group">
           <div class="space-y-3">
             <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -674,7 +942,7 @@
           <div class="pt-3 border-t border-dark-border space-y-1.5">
             <div class="flex items-center justify-between text-[11px] font-mono text-dark-muted">
               <span>ARQUEO EN VIVO</span>
-              <span class="text-emerald-400 font-bold">✓ CUADRADO</span>
+              <span class="text-emerald-400 font-bold arqueo-badge">✓ CUADRADO</span>
             </div>
             <div class="flex justify-between text-dark-muted text-[11px]">
               <span>Efectivo + QR</span>
@@ -688,7 +956,7 @@
         </div>
 
         <!-- Pilar 4: Local-First con Paquetes de Sincronización -->
-        <div class="linear-card flex flex-col justify-between space-y-4 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-4 group">
           <div class="space-y-3">
             <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -710,7 +978,7 @@
             <div class="relative flex items-center justify-between py-1">
               <span class="text-xs font-mono text-dark-text">PC / Local</span>
               <div class="flex-1 mx-3 relative flex items-center justify-center">
-                <div class="w-full h-[1px] bg-zinc-700"></div>
+                <div class="w-full h-[1px] bg-zinc-700 sync-track"></div>
                 <div class="packet-dot"></div>
               </div>
               <span class="text-xs font-mono text-emerald-400">Drive Backup</span>
@@ -724,7 +992,7 @@
       </div>
 
       <!-- Banner de Acción Directa -->
-      <div class="linear-card flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+      <div class="linear-card scroll-reveal flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
         <div>
           <h4 class="text-lg font-bold text-dark-text">
             ¿Querés implementar este sistema en tu local o ver una demo guiada?
@@ -761,7 +1029,7 @@
   <section id="mini-apps" class="py-24 border-b border-dark-border bg-dark-bg/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <div class="max-w-3xl mb-16 space-y-4">
+      <div class="max-w-3xl mb-16 space-y-4 scroll-reveal">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-400 font-semibold">
           <span>Turnos + Fichas + Fidelización</span>
           <span class="text-dark-border">•</span>
@@ -782,7 +1050,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         
         <!-- App 1: Mini CRM Móvil & Preventa -->
-        <div class="linear-card flex flex-col justify-between space-y-6 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Calle & Preventistas</span>
@@ -798,6 +1066,9 @@
               <div class="flex items-center justify-between text-xs">
                 <span class="font-bold text-dark-text">Hoja de Ruta #04 · San Martín</span>
                 <span class="font-mono text-[11px] text-emerald-400 font-bold">● 12 COMERCIOS</span>
+              </div>
+              <div class="w-full h-1 bg-zinc-800 rounded-full overflow-hidden my-1">
+                <div class="h-full bg-emerald-500 rounded-full route-progress-fill"></div>
               </div>
               <div class="divide-y divide-dark-border text-xs">
                 <div class="flex items-center justify-between py-1.5">
@@ -835,7 +1106,7 @@
         </div>
 
         <!-- App 2: Club de Fidelidad & Sellos -->
-        <div class="linear-card flex flex-col justify-between space-y-6 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-amber-400">Retención de Clientes</span>
@@ -852,7 +1123,7 @@
                 <span class="font-bold text-dark-text">Tarjeta Digital Socio VIP</span>
                 <span class="font-mono text-[11px] text-amber-400 font-bold">7 de 8 Sellos</span>
               </div>
-              <div class="grid grid-cols-4 gap-2 py-1 text-center">
+              <div class="grid grid-cols-4 gap-2 py-1 text-center items-center">
                 <span class="text-base py-1">⭐</span>
                 <span class="text-base py-1">⭐</span>
                 <span class="text-base py-1">⭐</span>
@@ -860,12 +1131,12 @@
                 <span class="text-base py-1">⭐</span>
                 <span class="text-base py-1">⭐</span>
                 <span class="text-base py-1">⭐</span>
-                <span class="text-base py-1 relative inline-flex items-center justify-center">
-                  <span class="w-6 h-6 rounded-full border border-dashed border-zinc-600 text-zinc-400 flex items-center justify-center text-[11px] font-mono group-hover:hidden select-none">8</span>
-                  <span class="hidden group-hover:inline-block stamp-animated-active select-none text-base">⭐</span>
+                <span class="text-base py-1 relative inline-flex items-center justify-center w-8 h-8 mx-auto">
+                  <span class="stamp-slot-number w-6 h-6 rounded-full border border-dashed border-zinc-600 text-zinc-400 flex items-center justify-center text-[11px] font-mono select-none">8</span>
+                  <span class="stamp-slot-star absolute inset-0 flex items-center justify-center select-none text-base pointer-events-none">⭐</span>
                 </span>
               </div>
-              <div class="text-[11px] text-amber-400 font-medium text-center">
+              <div class="text-[11px] text-amber-400 font-medium text-center stamp-reward-hint">
                 🎁 Próximo sello desbloquea premio gratis
               </div>
             </div>
@@ -888,7 +1159,7 @@
         </div>
 
         <!-- App 3: Peluquería & Color (3 en 1) -->
-        <div class="linear-card flex flex-col justify-between space-y-6 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Estética & Salones</span>
@@ -908,7 +1179,7 @@
               <div class="divide-y divide-dark-border text-xs">
                 <div class="flex items-center justify-between py-1.5">
                   <span class="font-bold text-dark-text">Martina · Cobrizo</span>
-                  <span class="text-[11px] text-emerald-400 font-mono">Fórmula 7.4 + 8.34</span>
+                  <span class="text-[11px] text-emerald-400 font-mono formula-highlight">Fórmula 7.4 + 8.34</span>
                 </div>
                 <div class="flex items-center justify-between py-1 text-dark-muted text-[11px]">
                   <span>Avisado por WhatsApp</span>
@@ -935,7 +1206,7 @@
         </div>
 
         <!-- App 4: Distribuidora & Bebidas -->
-        <div class="linear-card flex flex-col justify-between space-y-6 group">
+        <div class="linear-card scroll-reveal flex flex-col justify-between space-y-6 group">
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Comercio & Packs</span>
@@ -959,7 +1230,7 @@
                 </div>
                 <div>
                   <span class="text-[11px] text-emerald-400 block font-bold">Cajón x6 (Pack)</span>
-                  <span class="font-mono font-bold text-white tabular-nums">ARS $ 8.100,00 c/u</span>
+                  <span class="font-mono font-bold text-white tabular-nums pack-highlight">ARS $ 8.100,00 c/u</span>
                 </div>
               </div>
             </div>
@@ -1071,7 +1342,7 @@
   <section id="filosofia" class="py-24 border-b border-dark-border bg-dark-bg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <div class="max-w-3xl mb-16 space-y-3">
+      <div class="max-w-3xl mb-16 space-y-3 scroll-reveal">
         <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-dark-text">
           Hecho a medida de cómo trabajás vos, no al revés.
         </h2>
@@ -1083,7 +1354,7 @@
       <!-- Comparativa Limpia -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <div class="linear-card space-y-4 opacity-75">
+        <div class="linear-card scroll-reveal card-muted space-y-4">
           <div class="text-xs font-bold uppercase tracking-wider text-rose-400">Software tradicional de mercado</div>
           <ul class="space-y-3 text-sm text-dark-muted">
             <li class="flex items-start gap-2.5">
@@ -1105,7 +1376,7 @@
           </ul>
         </div>
 
-        <div class="linear-card border-emerald-500/40 space-y-4 shadow-xl">
+        <div class="linear-card scroll-reveal border-emerald-500/40 space-y-4 shadow-xl">
           <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">Mis soluciones para tu negocio</div>
           <ul class="space-y-3 text-sm text-dark-text font-medium">
             <li class="flex items-start gap-2.5">
@@ -1136,7 +1407,7 @@
        CONTACTO & CIERRE (Email Destacado)
        ========================================== -->
   <section id="contacto" class="py-24 bg-dark-card border-b border-dark-border text-center">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-reveal">
       
       <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-dark-text">
         ¿Tenés un negocio o querés una herramienta adaptada a tu trabajo?
@@ -1234,42 +1505,53 @@
        SCRIPTS DE INTERACTIVIDAD & CONTROL DE PESTAÑAS
        ========================================== -->
   <script>
-    // 1. Selector de Pestañas Interactivas del Mockup Hero
+    // 1. Selector de Pestañas Interactivas del Mockup Hero (0px Layout Shift)
     function switchTab(tab) {
-      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-zinc-800', 'text-white', 'font-bold');
-        btn.classList.add('text-dark-muted', 'font-medium');
+      const views = ['pos', 'stock', 'caja'];
+      views.forEach(v => {
+        const viewEl = document.getElementById('view-' + v);
+        const btnEl = document.getElementById('tab-' + v);
+        if (!viewEl) return;
+
+        if (v === tab) {
+          viewEl.classList.remove('is-inactive-tab');
+          viewEl.classList.add('is-active-tab');
+          if (btnEl) {
+            btnEl.classList.remove('text-dark-muted');
+            btnEl.classList.add('bg-zinc-800', 'text-white');
+          }
+        } else {
+          viewEl.classList.remove('is-active-tab');
+          viewEl.classList.add('is-inactive-tab');
+          if (btnEl) {
+            btnEl.classList.remove('bg-zinc-800', 'text-white');
+            btnEl.classList.add('text-dark-muted');
+          }
+        }
       });
-
-      const activeView = document.getElementById('view-' + tab);
-      const activeBtn = document.getElementById('tab-' + tab);
-
-      if (activeView && activeBtn) {
-        activeView.classList.remove('hidden');
-        activeBtn.classList.remove('text-dark-muted', 'font-medium');
-        activeBtn.classList.add('bg-zinc-800', 'text-white', 'font-bold');
-      }
     }
 
-    // 2. Simulación de Cobro Rápido en Vivo
+    // 2. Simulación de Cobro Rápido en Vivo (con espacio reservado fijo)
     let cobradoLinear = false;
     function simularCobroLinear() {
       const feedback = document.getElementById('feedbackLinear');
       const btn = document.getElementById('btnSimularCobroLinear');
       const texto = document.getElementById('textoCobroLinear');
+      if (!feedback || !btn || !texto) return;
 
       if (!cobradoLinear) {
         btn.classList.remove('bg-emerald-700', 'hover:bg-emerald-800');
         btn.classList.add('bg-zinc-800', 'border', 'border-zinc-700');
         texto.innerText = 'Cobro Completado';
-        feedback.classList.remove('hidden');
+        feedback.classList.remove('opacity-0');
+        feedback.classList.add('is-feedback-visible');
         cobradoLinear = true;
       } else {
         btn.classList.add('bg-emerald-700', 'hover:bg-emerald-800');
         btn.classList.remove('bg-zinc-800', 'border', 'border-zinc-700');
         texto.innerText = 'Cobrar y Emitir Comprobante';
-        feedback.classList.add('hidden');
+        feedback.classList.remove('is-feedback-visible');
+        feedback.classList.add('opacity-0');
         cobradoLinear = false;
       }
     }
@@ -1335,7 +1617,7 @@
     });
 
     // ==========================================
-    // 6. Efecto Spotlight Linear en Cursor
+    // 6. Efecto Spotlight Linear en Cursor (Desktop)
     // ==========================================
     function initLinearSpotlights() {
       document.querySelectorAll('.linear-card').forEach(card => {
@@ -1350,7 +1632,81 @@
     }
 
     // ==========================================
-    // 7. Simulador Auto-Pilot en el Hero (Estilo Linear Ágil)
+    // 7. Animaciones por Scroll & Activación en Celular (Touch / Mobile)
+    // ==========================================
+    function syncTouchOrMobileClass(forceTouch = false) {
+      const noHover = window.matchMedia('(hover: none)').matches;
+      const smallViewport = window.innerWidth < 1024;
+      if (forceTouch || noHover || smallViewport) {
+        document.body.classList.add('touch-or-mobile');
+      } else {
+        document.body.classList.remove('touch-or-mobile');
+      }
+    }
+
+    function initScrollMotion() {
+      syncTouchOrMobileClass();
+
+      let touchDetected = false;
+      window.addEventListener('touchstart', () => {
+        touchDetected = true;
+        syncTouchOrMobileClass(true);
+      }, { passive: true, once: true });
+
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => syncTouchOrMobileClass(touchDetected), 120);
+      });
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const revealEls = Array.from(document.querySelectorAll('.scroll-reveal'));
+      const cardEls = Array.from(document.querySelectorAll('.linear-card'));
+
+      if (reduceMotion || !('IntersectionObserver' in window)) {
+        revealEls.forEach(el => el.classList.add('is-revealed'));
+        return;
+      }
+
+      // Batched DOM read primero para evitar layout thrashing al revelar elementos ya visibles
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const alreadyVisible = revealEls.filter(el => el.getBoundingClientRect().top < vh * 0.95);
+      alreadyVisible.forEach(el => el.classList.add('is-revealed'));
+
+      // Observer 1: Entrada progresiva al hacer scroll
+      const revealObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.08,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      revealEls.forEach(el => {
+        if (!el.classList.contains('is-revealed')) {
+          revealObserver.observe(el);
+        }
+      });
+
+      // Observer 2: Activación de micro-interacciones mientras se scrollea (móvil / touch)
+      const inViewObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          entry.target.classList.toggle('in-view', entry.isIntersecting);
+        });
+      }, {
+        threshold: [0.22, 0.45],
+        rootMargin: '-12% 0px -12% 0px'
+      });
+
+      cardEls.forEach(card => inViewObserver.observe(card));
+    }
+
+    // ==========================================
+    // 8. Simulador Auto-Pilot en el Hero (Estilo Linear Ágil)
     // ==========================================
     let autopilotEnabled = true;
     let autopilotPausedByHover = false;
@@ -1397,19 +1753,25 @@
     // Inicialización al cargar la página
     document.addEventListener('DOMContentLoaded', () => {
       initLinearSpotlights();
+      initScrollMotion();
+
       // Ciclo ágil a 1.8 segundos por paso para ritmo fluido estilo Linear
       autopilotInterval = setInterval(stepAutopilot, 1800);
 
-      // Si el usuario coloca el cursor encima, pausa temporal; al salir reanuda
-      const heroMockup = document.querySelector('.tab-view')?.parentElement;
-      if (heroMockup) {
-        heroMockup.addEventListener('mouseenter', () => {
-          autopilotPausedByHover = true;
-          actualizarBadgeAutopilot();
+      // Pausa temporal SOLO con mouse (pointerType === 'mouse'), evitando bloquear en móvil tras tap
+      const heroTerminal = document.getElementById('heroTerminal');
+      if (heroTerminal) {
+        heroTerminal.addEventListener('pointerenter', (e) => {
+          if (e.pointerType === 'mouse') {
+            autopilotPausedByHover = true;
+            actualizarBadgeAutopilot();
+          }
         });
-        heroMockup.addEventListener('mouseleave', () => {
-          autopilotPausedByHover = false;
-          actualizarBadgeAutopilot();
+        heroTerminal.addEventListener('pointerleave', (e) => {
+          if (e.pointerType === 'mouse') {
+            autopilotPausedByHover = false;
+            actualizarBadgeAutopilot();
+          }
         });
       }
     });
